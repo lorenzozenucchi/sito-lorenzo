@@ -1,77 +1,91 @@
 ================================================================================
-IL SITO DI LORENZO — tre ritocchi puntuali, non toccare il resto
+LE CARD ESEMPIO — ribaltate: grandi, vere, con un accenno di movimento
 ================================================================================
 
-Seguito di una revisione esterna del sito. Lorenzo ha scelto solo tre dei
-punti sollevati; il resto (in particolare: rendere le card degli esempi
-grandi e "rivelatorie") è stato esplicitamente NON approvato, perché
-contraddice una scelta appena presa (la mistero/curiosità nelle anteprime,
-già costruita e verificata online) — NON toccare le card esempio, le loro
-immagini in `immagini/anteprima-*.png`, né la logica che le governa.
+Decisione di Lorenzo, esplicita e definitiva: si ribalta la scelta del task
+precedente. Le tre card della sezione "Come potrebbe essere" (id="esempi")
+oggi mostrano un dettaglio astratto e minuscolo apposta per non svelare
+nulla (frammenti di colore/texture, 88-92px). Si passa alla direzione
+opposta: card grandi, quasi "mini-browser", con un'anteprima vera e viva
+del sito — mostrare, non nascondere. Non è un'estensione del task
+precedente, è la sua inversione: le immagini attuali in
+`immagini/anteprima-*.png` vanno sostituite, non affiancate.
 
-## OBIETTIVO 1 — Il segnaposto foto, più elegante
+## OBIETTIVO
 
-Oggi (righe ~835-845) il blocco "Chi sono" mostra un'icona a matita/omino e
-il testo "Foto in arrivo" dentro un riquadro bordato tratteggiato. Sostituisci
-con un blocco tipografico elegante, senza icona: il nome «LORENZO ZENUCCHI»,
-sotto «Web Designer & Developer», sotto «Val Seriana» — stesso spirito
-sobrio del resto del sito (puoi usare gli stessi ruoli tipografici già in
-uso altrove: serif per il nome, mono maiuscolo piccolo per le due righe
-sotto). Stesse dimensioni/proporzioni del riquadro attuale (170px, aspect-
-ratio 4/5), stesso bordo tratteggiato o simile — cambia il contenuto interno,
-non l'ingombro nel layout.
+**1. Nuovi screenshot, più alti e più veri.** Con Playwright (funzionante
+per davvero), cattura per ciascuna delle tre pagine in `esempi/` uno
+screenshot più alto di prima — non solo il hero, ma hero + la sezione
+successiva (menu/listino/trattamenti), abbastanza materiale perché dentro la
+card si veda davvero scorrere qualcosa di riconoscibile: titoli, blocchi,
+colore, struttura — non serve che il testo sia leggibile per intero, ma la
+pagina deve sembrare viva e vera, non un dettaglio isolato. Salva le nuove
+immagini (stessi nomi in `immagini/anteprima-*.png`, sostituendo le
+precedenti, oppure nomi nuovi se preferisci — verifica poi che nessun
+riferimento resti rotto). Peso ragionevole per immagini più grandi e più
+importanti nel layout: qualche centinaio di KB è accettabile qui, a
+differenza delle miniature di prima — ma resta comunque ottimizzato,
+verificalo.
 
-**Mantieni il commento di manutenzione già presente**, aggiornandolo se
-necessario: quando arriva la foto vera, va sostituito questo blocco (non più
-un'icona) con `<img class="ritratto" src="foto/lorenzo.jpg" ...>` come già
-descritto. Il file/percorso/istruzioni restano identici, cambia solo cosa
-descrivono come stato "prima".
+**2. Card molto più grandi**, che dominano la sezione invece di essere un
+elemento fra tanti. La struttura oggi è una griglia con miniatura piccola a
+sinistra e testo a destra: cambia in un'anteprima che occupa quasi tutta la
+larghezza della card, in alto, ben più alta di prima (non un rettangolo di
+92px — qualcosa che si legga come una vera finestra su un sito, con
+un'altezza sostanziale), e sotto titolo, descrizione, freccia — impilato
+verticalmente, non più affiancato. Su schermi larghi puoi mantenere le tre
+card affiancate se restano comunque sostanziose, oppure impilarle anche lì:
+scegli tu in base a come rende meglio "grande", non "tre miniature vicine".
 
-## OBIETTIVO 2 — Una riga su "nessun abbonamento obbligatorio"
+**3. Una cornice da "finestra di sito"**, non solo un bordo. Sopra
+l'anteprima, una barra sottile che evochi la barra di un browser — tre
+piccoli pallini (nello stile del sito: toni oro/verde-muschio, MAI i colori
+letterali rosso/giallo/verde da sistema operativo, stonerebbero con la
+palette) e, se resta naturale, un accenno testuale del tipo un indirizzo
+web finto e coerente col nome di fantasia della pagina (es. per la
+trattoria qualcosa come "trattoriadelponte.it", in un carattere piccolo e
+smorzato, chiaramente parte della cornice decorativa e non un link vero).
+Facoltativo se non trovi un'esecuzione pulita — la barra con i pallini è la
+parte che conta di più.
 
-Nel riquadro "La tranquillità" (49 €/mese), aggiungi una riga breve, vicino
-al prezzo o subito sotto "Primo mese gratuito", che comunichi che non è un
-vincolo: qualcosa come "Nessun abbonamento obbligatorio" — stile coerente
-con `.prezzo-promo` o simile, non un blocco nuovo enorme. ATTENZIONE: il
-messaggio "la gestione è facoltativa" esiste già nel sottotitolo della
-sezione (`.sez-sub`, in cima a "Quanto costa"): questa riga nuova deve
-rinforzare quel concetto esattamente lì dove l'occhio guarda il prezzo, non
-ripeterlo con le stesse parole. Scegli una formulazione che non sia un
-doppione letterale della frase già presente.
+**4. Il sito "si muove leggermente da solo" dentro la finestra.** Dentro la
+cornice, l'immagine (più alta della finestra visibile) scorre lentissima
+avanti e indietro con un pan verticale via CSS (`transform: translateY`
+animato, non JavaScript) — un ciclo lungo (12-20 secondi), ease-in-out,
+loop infinito. Deve sembrare un respiro, non uno scroll frenetico: se lo
+guardi per tre secondi a malapena te ne accorgi, se aspetti di più vedi che
+la pagina è scorsa. Rispetta `prefers-reduced-motion` (la regola globale
+del sito già azzera le durate delle animazioni: verifica che si applichi
+anche a questa, che è nuova).
 
-## OBIETTIVO 3 — Un accenno di vita nell'illustrazione d'apertura
+**5. Le etichette sotto il titolo**, oggi una frase discorsiva per card
+("Menù sempre aggiornabile, orari, prenotazione con un tocco."): valuta se
+trasformarle in tag brevi separati da un punto, in monospace come le altre
+etichette tecniche del sito (es. "MENÙ · ORARI · PRENOTAZIONE") — più
+coerente con l'identità a dossier, più leggibile a colpo d'occhio. Se la
+frase discorsiva funziona meglio in un caso specifico, non forzare il
+cambio: usa giudizio.
 
-L'illustrazione in apertura (`.illo`, portatile e smartphone) ha già due
-comportamenti: si disegna tratto per tratto al caricamento, e si inclina
-leggermente al passaggio del cursore su desktop. Aggiungi un TERZO tocco,
-molto discreto, che la faccia sentire "viva" anche da ferma — per esempio un
-respiro lentissimo di opacità su uno o due elementi decorativi già presenti
-al suo interno (i puntini, la linea del grafico a onda), non un'aggiunta di
-nuovi elementi. Deve restare ambigua e astratta: NON deve mai suggerire il
-contenuto reale di uno dei tre esempi (niente testo leggibile, niente
-riferimento diretto a ristorante/parrucchiere/centro estetico) — è lo stesso
-principio di mistero applicato qui, non un'eccezione.
-
-Rispetta `prefers-reduced-motion` come tutto il resto della pagina (la
-regola globale già presente copre anche le nuove animazioni, ma verificalo).
+Mantieni: i segni ad angolo (`.cornice`, `.segno`), il numero `.cifra`
+(01/02/03), la freccia "Apri l'esempio →", il link alla pagina vera, la
+rivelazione `.smaschera` allo scroll della card intera.
 
 Nessuna modifica a `CLAUDE.md`.
 
 ## VERIFICA
 
-Con Playwright: screenshot delle tre zone toccate (chi sono, riquadro
-gestione, apertura), telefono e desktop. Conferma esplicita nel resoconto
-che le card esempio e le loro immagini sono rimaste invariate.
+Con Playwright: screenshot della sezione esempi su telefono e desktop, e
+una cattura a distanza di qualche secondo per confermare che il pan sia
+visibile ma lento (non uno scatto). Conferma che il link di ciascuna card
+porti ancora alla pagina giusta e che `esempi/*.html` non sia stato toccato.
 
 ## VINCOLI
 
-  - NON toccare le tre card esempio, le immagini `immagini/anteprima-*.png`,
-    la sezione "Come potrebbe essere": è il punto della revisione che
-    Lorenzo ha respinto.
-  - NON toccare la frase "Il sito si ripaga da solo...": resta, è testo
-    reale già collaudato su un cliente, non un'invenzione da ammorbidire.
-  - Non toccare testi, prezzi (le cifre), ordine delle sezioni, icone di
-    categoria, grana, sipario.
+  - Non toccare il contenuto delle tre pagine in `esempi/`: solo catturarle,
+    più in alto di prima.
+  - Non toccare testi, prezzi, ordine delle sezioni, icone di categoria,
+    illustrazione d'apertura, grana, sipario, effetti al gesto, il
+    segnaposto "chi sono", la riga "nessun vincolo di durata".
   - Non toccare `riferimenti/`, `foto/`, `demo-factory/`, `produzione/`.
   - Non fare commit né push.
   - Dubbio bloccante: fermati e fai UNA domanda mirata a Lorenzo.
