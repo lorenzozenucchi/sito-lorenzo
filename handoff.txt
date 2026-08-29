@@ -1,0 +1,57 @@
+================================================================================
+IL SITO DI LORENZO — anteprime vere nelle tre card esempio (non più rettangoli)
+================================================================================
+
+Task mirato su index.html. Lorenzo ha segnalato (con screenshot) che le mini-
+anteprime dentro le tre card della sezione "Come potrebbe essere" (id="esempi")
+non gli piacciono: oggi sono rettangoli disegnati in CSS (classe `.mock`,
+`.mock-ristorante`/`.mock-parrucchiere`/`.mock-estetico`) — una barra, un
+blocco "hero", righe di testo finte, tre quadratini in fondo. Sono rimaste
+identiche dal primissimo giro del sito, mentre le tre pagine vere che
+rappresentano sono state elevate molto da allora (icone/tipografia/layout
+propri per ciascuna). Non rappresentano più bene quello a cui puntano, e sono
+oggi l'unico elemento della pagina che sembra ancora un segnaposto.
+
+## OBIETTIVO
+
+**Sostituisci i rettangoli disegnati con veri screenshot delle tre pagine.**
+Playwright ora funziona per davvero in questo ambiente (le librerie di
+sistema mancanti sono state installate il 29/08/2026): usalo per catturare
+uno screenshot reale di ciascuna delle tre pagine in `esempi/`
+(ristorante.html, parrucchiere.html, centro-estetico.html), a una larghezza
+di viewport da telefono (es. 375px), e ritaglia la parte alta della pagina
+(il hero, la porzione più riconoscibile e colorata di ciascuna) in un
+formato verticale stretto — stesso rapporto d'aspetto usato oggi dal
+riquadro `.mock` (9:16), così il resto del layout della card non cambia.
+
+Salva i tre file in `immagini/anteprima-ristorante.png`,
+`immagini/anteprima-parrucchiere.png`, `immagini/anteprima-centro-
+estetico.png`. Ottimizza il peso (queste sono miniature, non devono pesare
+più di poche decine di KB l'una — verifica dopo il ritaglio).
+
+Sostituisci il contenuto di ciascun `.mock` (oggi le `<i>` disegnate a CSS)
+con un `<img>` che punta al proprio screenshot, mantenendo bordo, angoli e
+l'effetto di leggero ingrandimento al passaggio del mouse/dito già presenti
+sulla card. Puoi semplificare o rimuovere le regole CSS `.mock i`, `.m-barra`,
+`.m-hero`, ecc. se non servono più — ma verifica prima che nessun'altra
+parte della pagina le riusi.
+
+Nessuna modifica a `CLAUDE.md`.
+
+## VERIFICA
+
+Con Playwright: screenshot della sezione esempi della home, su telefono
+stretto e desktop — le tre anteprime devono mostrare davvero l'aspetto reale
+di ciascuna pagina (colori, layout riconoscibili), non più rettangoli
+astratti. Conferma che il peso complessivo della home resti ragionevole
+dopo l'aggiunta delle tre immagini.
+
+## VINCOLI
+
+  - Non toccare il contenuto delle tre pagine in `esempi/`: solo catturarle,
+    non modificarle.
+  - Non toccare testi, prezzi, ordine delle sezioni, icone di categoria,
+    illustrazione d'apertura, grana, sipario, effetti al gesto.
+  - Non toccare `riferimenti/`, `foto/`, `demo-factory/`, `produzione/`.
+  - Non fare commit né push.
+  - Dubbio bloccante: fermati e fai UNA domanda mirata a Lorenzo.
