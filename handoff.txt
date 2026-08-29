@@ -1,64 +1,77 @@
 ================================================================================
-LE ANTEPRIME NELLE CARD ESEMPIO — un dettaglio, non la pagina intera
+IL SITO DI LORENZO — tre ritocchi puntuali, non toccare il resto
 ================================================================================
 
-Seguito diretto del task che ha sostituito i rettangoli CSS con screenshot
-veri delle tre pagine in `esempi/`. Lorenzo ha rivisto il risultato: lo
-screenshot dell'intero hero, anche se vero, mostra troppo — chi guarda la
-card vede già tutto quello che troverebbe aprendo l'esempio, e questo toglie
-la curiosità di cliccare. Non tornare ai rettangoli disegnati (quella
-versione è già stata scartata in un task precedente): resta uno screenshot
-vero, ma di un DETTAGLIO della pagina, non della composizione intera.
+Seguito di una revisione esterna del sito. Lorenzo ha scelto solo tre dei
+punti sollevati; il resto (in particolare: rendere le card degli esempi
+grandi e "rivelatorie") è stato esplicitamente NON approvato, perché
+contraddice una scelta appena presa (la mistero/curiosità nelle anteprime,
+già costruita e verificata online) — NON toccare le card esempio, le loro
+immagini in `immagini/anteprima-*.png`, né la logica che le governa.
 
-## OBIETTIVO
+## OBIETTIVO 1 — Il segnaposto foto, più elegante
 
-Per ciascuna delle tre card in index.html (id="esempi"), sostituisci lo
-screenshot attuale (l'intero hero) con un ritaglio molto più stretto —
-un frammento riconoscibile ma parziale: un pezzo di texture/colore, un
-frammento di una lettera grande del titolo, un angolo con un bagliore — mai
-l'intera composizione con testo leggibile per intero. La prova che hai
-scelto bene: guardando il ritaglio isolato non si deve poter leggere il nome
-del locale né capire il layout della pagina, ma si deve percepire subito il
-tono (caldo/scuro, grafico/chiaro, morbido/arioso) — è quello il messaggio
-da lasciar passare, non il contenuto.
+Oggi (righe ~835-845) il blocco "Chi sono" mostra un'icona a matita/omino e
+il testo "Foto in arrivo" dentro un riquadro bordato tratteggiato. Sostituisci
+con un blocco tipografico elegante, senza icona: il nome «LORENZO ZENUCCHI»,
+sotto «Web Designer & Developer», sotto «Val Seriana» — stesso spirito
+sobrio del resto del sito (puoi usare gli stessi ruoli tipografici già in
+uso altrove: serif per il nome, mono maiuscolo piccolo per le due righe
+sotto). Stesse dimensioni/proporzioni del riquadro attuale (170px, aspect-
+ratio 4/5), stesso bordo tratteggiato o simile — cambia il contenuto interno,
+non l'ingombro nel layout.
 
-Scegli il ritaglio caso per caso, guardando ciascuna pagina con Playwright
-(già sbloccato per davvero adesso, nessun aggiramento necessario):
-  - **ristorante**: qualcosa dal bagliore ambrato del hero, o un frammento
-    della texture/tipografia — mai il piatto del menu leggibile.
-  - **parrucchiere**: un frammento della tipografia Bebas Neue molto
-    ingrandito (una o due lettere, tagliate ai bordi) — il carattere da
-    poster si riconosce anche da un pezzo solo.
-  - **centro estetico**: un dettaglio dell'alone morbido, o un frammento del
-    titolo in Playfair Display molto ravvicinato.
+**Mantieni il commento di manutenzione già presente**, aggiornandolo se
+necessario: quando arriva la foto vera, va sostituito questo blocco (non più
+un'icona) con `<img class="ritratto" src="foto/lorenzo.jpg" ...>` come già
+descritto. Il file/percorso/istruzioni restano identici, cambia solo cosa
+descrivono come stato "prima".
 
-Tecnicamente: puoi ricavare questi ritagli dagli screenshot già catturati nel
-task precedente (ritagliando una porzione più piccola) o ricatturarli da
-zero con un viewport/zoom diverso — scegli tu il modo più pulito. Aggiorna
-i file in `immagini/anteprima-*.png` con le nuove versioni (stessi nomi,
-sostituisci il contenuto) così non serve toccare i riferimenti nell'HTML.
+## OBIETTIVO 2 — Una riga su "nessun abbonamento obbligatorio"
 
-Facoltativo, solo se resta naturale: un lieve movimento del dettaglio al
-passaggio del dito/mouse (un panning minimo, non uno zoom che rivela di
-più) — coerente con l'effetto di leggero ingrandimento già presente sulla
-card. Non obbligatorio: se non aggiunge nulla, lascialo fermo.
+Nel riquadro "La tranquillità" (49 €/mese), aggiungi una riga breve, vicino
+al prezzo o subito sotto "Primo mese gratuito", che comunichi che non è un
+vincolo: qualcosa come "Nessun abbonamento obbligatorio" — stile coerente
+con `.prezzo-promo` o simile, non un blocco nuovo enorme. ATTENZIONE: il
+messaggio "la gestione è facoltativa" esiste già nel sottotitolo della
+sezione (`.sez-sub`, in cima a "Quanto costa"): questa riga nuova deve
+rinforzare quel concetto esattamente lì dove l'occhio guarda il prezzo, non
+ripeterlo con le stesse parole. Scegli una formulazione che non sia un
+doppione letterale della frase già presente.
+
+## OBIETTIVO 3 — Un accenno di vita nell'illustrazione d'apertura
+
+L'illustrazione in apertura (`.illo`, portatile e smartphone) ha già due
+comportamenti: si disegna tratto per tratto al caricamento, e si inclina
+leggermente al passaggio del cursore su desktop. Aggiungi un TERZO tocco,
+molto discreto, che la faccia sentire "viva" anche da ferma — per esempio un
+respiro lentissimo di opacità su uno o due elementi decorativi già presenti
+al suo interno (i puntini, la linea del grafico a onda), non un'aggiunta di
+nuovi elementi. Deve restare ambigua e astratta: NON deve mai suggerire il
+contenuto reale di uno dei tre esempi (niente testo leggibile, niente
+riferimento diretto a ristorante/parrucchiere/centro estetico) — è lo stesso
+principio di mistero applicato qui, non un'eccezione.
+
+Rispetta `prefers-reduced-motion` come tutto il resto della pagina (la
+regola globale già presente copre anche le nuove animazioni, ma verificalo).
 
 Nessuna modifica a `CLAUDE.md`.
 
 ## VERIFICA
 
-Con Playwright: screenshot della sezione esempi su telefono e desktop.
-Controlla esplicitamente che nessuno dei tre ritagli lasci leggere testo
-vero (nomi, prezzi, voci di menu/listino) — deve restare un'impressione,
-non un'anteprima di contenuto.
+Con Playwright: screenshot delle tre zone toccate (chi sono, riquadro
+gestione, apertura), telefono e desktop. Conferma esplicita nel resoconto
+che le card esempio e le loro immagini sono rimaste invariate.
 
 ## VINCOLI
 
-  - Non toccare il contenuto delle tre pagine in `esempi/`: solo catturarle.
-  - Bordo, angoli con i segni della card, e l'effetto di ingrandimento al
-    passaggio restano come sono — cambia solo cosa c'è dentro l'immagine.
-  - Non toccare testi, prezzi, ordine delle sezioni, icone di categoria,
-    illustrazione d'apertura, grana, sipario, effetti al gesto.
+  - NON toccare le tre card esempio, le immagini `immagini/anteprima-*.png`,
+    la sezione "Come potrebbe essere": è il punto della revisione che
+    Lorenzo ha respinto.
+  - NON toccare la frase "Il sito si ripaga da solo...": resta, è testo
+    reale già collaudato su un cliente, non un'invenzione da ammorbidire.
+  - Non toccare testi, prezzi (le cifre), ordine delle sezioni, icone di
+    categoria, grana, sipario.
   - Non toccare `riferimenti/`, `foto/`, `demo-factory/`, `produzione/`.
   - Non fare commit né push.
   - Dubbio bloccante: fermati e fai UNA domanda mirata a Lorenzo.
