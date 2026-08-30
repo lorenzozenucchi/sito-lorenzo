@@ -1,44 +1,112 @@
 ================================================================================
-ANTEPRIMA RISTORANTE — troppo spazio vuoto in alto nel riposo del pan
+SEI RITOCCHI DI CONTENUTO — ruolo, esempi, domini finti, extra, chiusura, chi sono
 ================================================================================
 
-Le tre anteprime vanno bene, confermato da Lorenzo. Un solo difetto:
-`immagini/anteprima-ristorante.png` ha molto spazio vuoto (buio, senza
-testo) fra la barra in alto e il titolo "Il sapore vero della valle" —
-guardala con il tool Read/Playwright prima di agire, per vedere esattamente
-quanto. Il pan attuale (`@keyframes mock-pan`, in index.html) riposa a
-`translateY(0)` sia allo 0% che al 100% del ciclo, e scende solo per un
-istante al 50%: significa che la card della trattoria passa la maggior
-parte dei suoi 18 secondi a mostrare proprio quello spazio vuoto in cima,
-non il contenuto.
+Sei modifiche indipendenti su index.html, decise da Lorenzo dopo aver
+rivisto il sito. Verificate tutte contro il file reale prima di scrivere
+questo CROC: i riferimenti sotto sono precisi.
 
-## OBIETTIVO
+## 1 — Togliere "& developer" dalla riga di ruolo
 
-Ritaglia (trim) la parte superiore vuota di `immagini/anteprima-
-ristorante.png`, quanto basta perché il bordo superiore dell'immagine
-ritagliata sia già vicino a dove inizia il contenuto interessante (titolo o
-poco prima) — non serve eliminare la barra con "Trattoria del Ponte" e
-"Chiama ora" se ci sta comodamente, ma il grande vuoto sotto va tolto.
-Aggiorna anche l'attributo `height` sul tag `<img>` di quella card in
-index.html se cambia l'altezza reale del file (l'attributo `width` resta
-uguale). Non toccare le altre due immagini né la pagina `esempi/
-ristorante.html`: il problema è solo nel ritaglio usato per l'anteprima.
+Tre punti, tutti allo stesso modo:
+  - Apertura: `<p class="ruolo">Web designer &amp; developer</p>` diventa
+    "Web designer · Val Seriana" (aggiungi la località, non c'era prima:
+    verifica che lo stile visivo — spaziatura, maiuscole — resti coerente
+    col resto della riga).
+  - Footer: `<p>Web designer &amp; developer · Val Seriana, Bergamo</p>`
+    diventa "Web designer · Val Seriana, Bergamo".
+  - `<title>` e `<meta name="description">` in cima al file: controlla se
+    contengono "developer" o un concetto equivalente e allinea alla stessa
+    scelta (solo "web designer", non "web designer e developer").
 
-Verifica il risultato con Playwright: la card della trattoria, osservata a
-riposo (senza aspettare il pan), deve mostrare già qualcosa di riconoscibile
-— non un rettangolo prevalentemente vuoto.
+## 2 — Sezione esempi: titolo, testo, nota
 
-Nessuna modifica a `CLAUDE.md`. Nessuna catena di revisione.
+  - `<h2>` da "Come potrebbe <em>essere</em>" a "Tre esempi, <em>fatti da
+    me</em>" (mantieni l'enfasi in corsivo su una parte della frase, scegli
+    tu quale porzione mettere in `<em>` se "fatti da me" non funziona
+    identico).
+  - In coda al paragrafo `.sez-sub` esistente ("Non sono immagini: sono
+    pagine vere...") aggiungi: "Attività inventate, siti veri." — stessa
+    frase, non sostituire quella che c'è.
+  - La nota sotto le tre card (`.nota-categorie`, su B&B/negozi/
+    professionisti) va riscritta o eliminata per evitare un doppione col
+    nuovo testo del paragrafo: se il paragrafo dice già chiaramente che le
+    attività sono inventate e le pagine vere, la nota deve limitarsi a dire
+    SOLO la parte che non c'è già altrove — quali categorie mancano e
+    l'invito a scrivere per averne una su misura. Non ripetere "sono pagine
+    vere" due volte nella stessa sezione.
 
-## VINCOLI
+## 3 — Domini finti nei mockup: due dei tre sono registrati per davvero
 
-  - Non toccare `esempi/ristorante.html` né le altre due immagini
-    anteprima.
-  - Non toccare la logica del pan (`@keyframes mock-pan`, le durate per
-    card): il problema è nell'immagine sorgente, non nell'animazione.
-  - Non toccare testi, prezzi, ordine delle sezioni, icone di categoria,
-    illustrazione d'apertura, grana, sipario, effetti al gesto, la barra
-    "foglio X/Y" (va rimossa se non lo è già, ma è un task separato — non
-    reintrodurla).
+Verificato via DNS/HTTP in fase di pianificazione, non un'ipotesi:
+  - `trattoriadelponte.it` (riga ~778) → REGISTRATO, parcheggiato presso un
+    servizio di parcheggio domini (nessuna attività vera dietro, ma è
+    comunque proprietà di qualcun altro). Sostituisci con
+    **"trattoriaponte.it"** (verificato libero).
+  - `novehairstudio.it` (riga ~797) → verificato libero, NON serve
+    cambiarlo.
+  - `biancaluna.it` (riga ~816) → REGISTRATO (DNS attivo su più indirizzi),
+    contenuto non verificabile con certezza ma non libero. Sostituisci con
+    **"biancalunaestetica.it"** (verificato libero).
+
+Prima di usarle, riverifica tu stesso che le due nuove stringhe non
+risolvano via DNS (stesso controllo, `python3 -c "import socket;
+socket.gethostbyname('...')"`, deve dare errore) — è passato tempo dalla
+verifica fatta qui, un dominio libero può essere registrato da chiunque in
+qualsiasi momento.
+
+## 4 — Rimuovere la fascia "Extra, se ti servono"
+
+Elimina per intero il blocco `<div class="extra reveal">...</div>` (prenotazioni
++200€, inglese +50€, foto +50€). Si quotano di persona, non sul sito.
+Verifica che togliendolo non resti uno spazio vuoto anomalo fra i due
+riquadri prezzo e le garanzie sotto — la spaziatura della sezione deve
+restare pulita, non un buco.
+
+## 5 — Rimuovere la frase di chiusura sul prezzo
+
+Elimina `<p class="chiusura reveal">«Il sito si ripaga da solo...»</p>`.
+NESSUNA sostituzione: resta lo stacco naturale fra la fascia garanzie e la
+fine della sezione prezzi, non riempirlo con un'altra frase.
+
+## 6 — "Chi sono": via il blocco a forma di biglietto
+
+Rimuovi tutto il div `.ritratto` (il blocco tipografico nome/ruolo/località
+dentro il riquadro con bordo tratteggiato, quello che oggi sostituisce la
+foto) — nessun segnaposto al suo posto. Il testo (i tre paragrafi "Mi chiamo
+Lorenzo...") passa a piena larghezza. Verifica il CSS `.chi` (oggi è una
+griglia a due colonne da 660px in su, ritratto+testo): senza il ritratto va
+adattato a una sola colonna, non lasciato con uno spazio vuoto a sinistra.
+
+**Mantieni il commento di manutenzione sulla foto** (quello che dice dove
+mettere `foto/lorenzo.jpg` quando arriva): riscrivilo per riflettere che ora
+non c'è nessun placeholder da sostituire, ma un blocco `.ritratto` da
+AGGIUNGERE ex novo quando la foto sarà pronta (non più "sostituisci questo
+div", ma "quando arriva la foto, aggiungi un blocco così, e rimetti la
+griglia a due colonne nel CSS `.chi`").
+
+Nessuna modifica a `CLAUDE.md`. Nessuna catena di revisione: verifica tu
+stesso e riporta l'esito.
+
+## VERIFICA
+
+Con Playwright, telefono e desktop: le sei modifiche sono tutte presenti,
+"chi sono" non ha spazi vuoti anomali, la sezione prezzi non ha buchi dove
+prima c'erano "extra" e la chiusura, i due nuovi domini nei mockup non
+risolvono via DNS.
+
+## VINCOLI, esplicitamente confermati da Lorenzo come INVARIATI
+
+  - La gestione (49€/mese) resta dichiarata facoltativa: non toccare quella
+    frase.
+  - Non aggiungere nessun accenno al fatto che il sito arrivi con una demo
+    già pronta: non è nel sito, resta così.
+  - Il footer che appare due/tre volte durante la cattura Playwright è un
+    artefatto dello strumento di verifica, non un bug nel file: non
+    "correggerlo", probabilmente non c'è niente da correggere — se lo trovi
+    anche guardando il DOM reale (non lo screenshot), allora sì, fermati e
+    segnalalo.
+  - Non toccare `esempi/`, `immagini/`, `riferimenti/`, `foto/`,
+    `demo-factory/`, `produzione/`.
   - Non fare commit né push.
   - Dubbio bloccante: fermati e fai UNA domanda mirata a Lorenzo.

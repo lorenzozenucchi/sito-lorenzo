@@ -488,7 +488,6 @@
 
   /* ---------------------------------------------------------- CHI SONO */
   .chi{display:grid; gap:32px;}
-  @media(min-width:660px){ .chi{grid-template-columns:190px 1fr; gap:42px; align-items:center;} }
   .ritratto{
     width:170px; aspect-ratio:4/5;
     background:var(--verde-carta); border:1px dashed var(--oro-fioco);
@@ -668,7 +667,7 @@
   <div class="wrap apertura-int">
     <div class="apertura-testa">
       <h1 class="nome">Lorenzo Zenucchi</h1>
-      <p class="ruolo">Web designer &amp; developer</p>
+      <p class="ruolo">Web designer · Val Seriana</p>
 
       <div class="filo-oro"></div>
 
@@ -765,8 +764,8 @@
 <section class="sez" id="esempi">
   <div class="wrap">
     <p class="occhiello reveal">Il tuo sito</p>
-    <h2 class="reveal">Come potrebbe <em>essere</em></h2>
-    <p class="sez-sub reveal">Non sono immagini: sono pagine vere, si aprono e si scorrono col dito. Guardale dal telefono, è così che le vedranno i tuoi clienti.</p>
+    <h2 class="reveal">Tre esempi, <em>fatti da me</em></h2>
+    <p class="sez-sub reveal">Non sono immagini: sono pagine vere, si aprono e si scorrono col dito. Guardale dal telefono, è così che le vedranno i tuoi clienti. Attività inventate, siti veri.</p>
 
     <div class="griglia-esempi">
       <a class="card-esempio cornice smaschera" href="esempi/ristorante.html">
@@ -775,7 +774,7 @@
         <div class="finestra" aria-hidden="true">
           <div class="finestra-barra">
             <span class="finestra-pallini"><i></i><i></i><i></i></span>
-            <span class="finestra-indirizzo">trattoriadelponte.it</span>
+            <span class="finestra-indirizzo">trattoriaponte.it</span>
           </div>
           <div class="mock mock-ristorante">
             <img src="immagini/anteprima-ristorante.png" alt="" width="390" height="910" loading="lazy">
@@ -813,7 +812,7 @@
         <div class="finestra" aria-hidden="true">
           <div class="finestra-barra">
             <span class="finestra-pallini"><i></i><i></i><i></i></span>
-            <span class="finestra-indirizzo">biancaluna.it</span>
+            <span class="finestra-indirizzo">biancalunaestetica.it</span>
           </div>
           <div class="mock mock-estetico">
             <img src="immagini/anteprima-centro-estetico.png" alt="" width="390" height="1500" loading="lazy">
@@ -897,15 +896,6 @@
       </div>
     </div>
 
-    <div class="extra reveal">
-      <p class="extra-titolo">Extra, se ti servono</p>
-      <ul>
-        <li><span>Prenotazioni dal sito, senza commissioni</span><span>+200 €</span></li>
-        <li><span>Sito anche in inglese</span><span>+50 €</span></li>
-        <li><span>Servizio foto</span><span>+50 €</span></li>
-      </ul>
-    </div>
-
     <div class="garanzie">
       <div class="garanzia reveal">
         <h4>Nessun vincolo</h4>
@@ -916,8 +906,6 @@
         <p>Metà all'avvio, metà quando è online e ti piace.</p>
       </div>
     </div>
-
-    <p class="chiusura reveal">«Il sito si ripaga da solo:<br>basta un appuntamento in più a settimana.»</p>
   </div>
 </section>
 
@@ -955,21 +943,19 @@
     <h2 class="reveal">Ci sono <em>io</em>, non un'agenzia</h2>
 
     <div class="chi reveal">
-      <!-- SEGNAPOSTO FOTO — sostituire appena c'è la foto vera di Lorenzo.
-           Oggi qui c'è un blocco tipografico (nome / ruolo / località) al
-           posto della foto. Metti il file in  foto/lorenzo.jpg  (ritratto,
-           lato lungo ~900 px, sotto i 300 KB) e rimpiazza tutto il div
-           .ritratto con:
-           <img class="ritratto" src="foto/lorenzo.jpg" alt="Lorenzo Zenucchi"
-                width="170" height="212" style="object-fit:cover;border:none;">
+      <!-- SEGNAPOSTO FOTO — oggi non c'è nessun blocco .ritratto: il testo
+           occupa tutta la larghezza. Quando la foto vera di Lorenzo sarà
+           pronta:
+           1. metti il file in  foto/lorenzo.jpg  (ritratto, lato lungo
+              ~900 px, sotto i 300 KB)
+           2. AGGIUNGI ex novo (non c'è nessun placeholder da sostituire)
+              prima del testo:
+                <img class="ritratto" src="foto/lorenzo.jpg" alt="Lorenzo Zenucchi"
+                     width="170" height="212" style="object-fit:cover;border:none;">
+           3. rimetti la griglia a due colonne nel CSS .chi:
+                @media(min-width:660px){ .chi{grid-template-columns:190px 1fr; gap:42px; align-items:center;} }
            Serve una foto vera: chi ti ha appena incontrato in negozio deve
            riconoscere la faccia. Niente foto di repertorio. -->
-      <div class="ritratto" role="img" aria-label="Foto di Lorenzo Zenucchi, in arrivo">
-        <span class="ritratto-nome">Lorenzo<br>Zenucchi</span>
-        <span class="ritratto-filo" aria-hidden="true"></span>
-        <span class="ritratto-ruolo">Web Designer<br>&amp; Developer</span>
-        <span class="ritratto-luogo">Val Seriana</span>
-      </div>
 
       <div>
         <p>Mi chiamo Lorenzo, sono della Val Seriana e faccio siti per le attività della valle.</p>
@@ -1024,7 +1010,7 @@
       <span class="sigillo-testo">LZ</span>
     </div>
     <p class="firma">Lorenzo Zenucchi</p>
-    <p>Web designer &amp; developer · Val Seriana, Bergamo</p>
+    <p>Web designer · Val Seriana, Bergamo</p>
     <p>Questa pagina è fatta come i siti che vendo: un solo file, nessun cookie, nessun tracciamento.</p>
   </div>
 </footer>
