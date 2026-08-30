@@ -1,83 +1,44 @@
 ================================================================================
-COMPLETARE LE CARD ESEMPIO (fatto solo a metà) + RIMUOVERE IL FOGLIO X/Y
+ANTEPRIMA RISTORANTE — troppo spazio vuoto in alto nel riposo del pan
 ================================================================================
 
-Due correzioni indipendenti su questo stesso progetto.
+Le tre anteprime vanno bene, confermato da Lorenzo. Un solo difetto:
+`immagini/anteprima-ristorante.png` ha molto spazio vuoto (buio, senza
+testo) fra la barra in alto e il titolo "Il sapore vero della valle" —
+guardala con il tool Read/Playwright prima di agire, per vedere esattamente
+quanto. Il pan attuale (`@keyframes mock-pan`, in index.html) riposa a
+`translateY(0)` sia allo 0% che al 100% del ciclo, e scende solo per un
+istante al 50%: significa che la card della trattoria passa la maggior
+parte dei suoi 18 secondi a mostrare proprio quello spazio vuoto in cima,
+non il contenuto.
 
-## PARTE 1 — Rimuovi l'indicatore "foglio X/Y"
+## OBIETTIVO
 
-Lorenzo l'ha visto in alto a destra e non lo vuole. Rimuovilo per intero, non
-solo nasconderlo con CSS: l'elemento `#foglio` nell'HTML, la sua regola CSS
-(cerca il commento "foglio X/Y"), e lo script che lo aggiorna (cerca
-`getElementById('foglio')`). Verifica con `grep` che non resti nessun
-residuo (variabile inutilizzata, commento orfano) dopo la rimozione.
+Ritaglia (trim) la parte superiore vuota di `immagini/anteprima-
+ristorante.png`, quanto basta perché il bordo superiore dell'immagine
+ritagliata sia già vicino a dove inizia il contenuto interessante (titolo o
+poco prima) — non serve eliminare la barra con "Trattoria del Ponte" e
+"Chiama ora" se ci sta comodamente, ma il grande vuoto sotto va tolto.
+Aggiorna anche l'attributo `height` sul tag `<img>` di quella card in
+index.html se cambia l'altezza reale del file (l'attributo `width` resta
+uguale). Non toccare le altre due immagini né la pagina `esempi/
+ristorante.html`: il problema è solo nel ritaglio usato per l'anteprima.
 
-## PARTE 2 — Le card esempio: completa quello che manca
+Verifica il risultato con Playwright: la card della trattoria, osservata a
+riposo (senza aspettare il pan), deve mostrare già qualcosa di riconoscibile
+— non un rettangolo prevalentemente vuoto.
 
-**Diagnosi, verificata guardando il file**: il task che doveva ingrandire le
-card e renderle "rivelatorie" ha fatto solo il primo passo — le immagini in
-`immagini/anteprima-*.png` sono davvero state sostituite con screenshot più
-alti e veri (fino a 840×1494px reali, controllato in pixel). Ma il
-contenitore che le mostra (`.mock`, dentro `.card-esempio`) è rimasto
-IDENTICO a prima del cambio: 184×327px, `aspect-ratio:9/16`,
-`object-fit:cover` statico, nessuna barra da browser, nessun movimento. Il
-risultato è un ritaglio piccolo e casuale da un'immagine molto più grande e
-dettagliata — ecco perché sembra peggiore di prima, non migliore. Mancano
-tre pezzi, costruiscili ora:
-
-**1. Card molto più grandi.** Oggi `.card-esempio` è una griglia
-`92px 1fr` (miniatura piccola + testo affiancato). Cambia in: l'anteprima
-occupa quasi tutta la larghezza della card, in alto, con un'altezza
-sostanziale (pensa a qualcosa come 220-320px di altezza visibile, non 88px
-— deve leggersi come una vera finestra su un sito), poi sotto impilati
-titolo, descrizione, freccia. Su desktop puoi mantenere tre colonne se ogni
-card resta comunque grande, o impilarle: scegli in base a cosa rende
-meglio "grande e vera", non "tre miniature vicine appena più larghe".
-
-**2. La cornice da "finestra di sito".** Sopra l'anteprima, una barra
-sottile con tre piccoli pallini in stile sito (toni oro/verde-muschio, MAI
-rosso/giallo/verde letterali da sistema operativo). Se resta pulito,
-un'etichetta testuale piccola e smorzata con un indirizzo di fantasia
-coerente col nome della pagina (es. "trattoriadelponte.it"). La barra dei
-pallini è la parte che conta di più; l'indirizzo è facoltativo.
-
-**3. Il movimento**: dentro la cornice, l'immagine (più alta della finestra
-visibile) scorre lentissima avanti e indietro — `transform: translateY`
-animato via CSS, ciclo lungo (12-20 secondi), ease-in-out, loop infinito. Un
-respiro, non uno scroll frenetico. Rispetta `prefers-reduced-motion` (la
-regola globale del sito già copre le nuove animazioni: verifica che si
-applichi anche a questa).
-
-Le immagini attuali dovrebbero già andare bene per questo (sono
-effettivamente alte): usale così come sono. Solo se, guardandole ingrandite
-con Playwright, una risultasse inadatta (troppo corta per un pan
-significativo, o il contenuto interessante tagliato male), ricatturala più
-alta — ma verifica prima di rifare lavoro già fatto bene.
-
-Mantieni: i segni ad angolo (`.cornice`, `.segno`), il numero `.cifra`
-(01/02/03 — questo è un numero diverso dal "foglio X/Y" della Parte 1, resta
-questo), la freccia "Apri l'esempio →", il link alla pagina vera, la
-rivelazione `.smaschera` della card intera.
-
-Nessuna modifica a `CLAUDE.md`. Nessuna catena di revisione: verifica tu
-stesso con attenzione e riporta l'esito.
-
-## VERIFICA
-
-Con Playwright, telefono stretto e desktop: le tre card sono grandi e
-dominano la sezione, mostrano davvero il contenuto delle pagine (non un
-frammento casuale), la barra con i pallini è coerente con la palette, il pan
-è visibile ma lento (cattura due screenshot a qualche secondo di distanza
-per confermarlo), e l'indicatore "foglio X/Y" non compare più da nessuna
-parte.
+Nessuna modifica a `CLAUDE.md`. Nessuna catena di revisione.
 
 ## VINCOLI
 
-  - Non toccare il contenuto delle tre pagine in `esempi/`.
+  - Non toccare `esempi/ristorante.html` né le altre due immagini
+    anteprima.
+  - Non toccare la logica del pan (`@keyframes mock-pan`, le durate per
+    card): il problema è nell'immagine sorgente, non nell'animazione.
   - Non toccare testi, prezzi, ordine delle sezioni, icone di categoria,
-    illustrazione d'apertura, grana, sipario, effetti al gesto, il
-    segnaposto "chi sono", la riga "nessun vincolo di durata", il tratto SVG
-    sul 490 € e il sigillo nel footer (se già presenti, lasciali).
-  - Non toccare `riferimenti/`, `foto/`, `demo-factory/`, `produzione/`.
+    illustrazione d'apertura, grana, sipario, effetti al gesto, la barra
+    "foglio X/Y" (va rimossa se non lo è già, ma è un task separato — non
+    reintrodurla).
   - Non fare commit né push.
   - Dubbio bloccante: fermati e fai UNA domanda mirata a Lorenzo.
