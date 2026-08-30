@@ -136,18 +136,6 @@
   #barra-progresso{position:fixed; top:0; left:0; right:0; height:2px; z-index:400; pointer-events:none;}
   #barra-progresso-riempimento{width:100%; height:100%; background:var(--oro); transform:scaleX(0); transform-origin:0 0;}
 
-  /* --------------------------------------------------------- foglio X/Y
-     Etichetta che riflette in quale delle sei aree del documento si trova
-     chi legge (vedi script in fondo). In alto a destra: l'unico angolo che
-     non incontra mai la barra fissa Chiama/WhatsApp, ancorata in basso solo
-     sotto i 760px.
-     --------------------------------------------------------------------- */
-  #foglio{
-    position:fixed; top:14px; right:14px; z-index:400;
-    padding:5px 9px; pointer-events:none;
-    background:rgba(5,20,20,0.55); border:1px solid var(--filo);
-  }
-
   .scena{position:relative; z-index:1;}
 
   .wrap{max-width:var(--max); margin:0 auto; padding:0 22px;}
@@ -332,20 +320,21 @@
   @media(min-width:900px){ .cat span{text-align:left;} }
 
   /* ------------------------------------------------------------ ESEMPI */
-  .griglia-esempi{display:grid; gap:20px;}
+  .griglia-esempi{display:grid; gap:22px;}
   @media(min-width:820px){ .griglia-esempi{grid-template-columns:repeat(3, 1fr); gap:26px;} }
 
   .card-esempio{
-    display:grid; grid-template-columns:92px 1fr; gap:18px; align-items:center;
+    display:block;
     background:var(--verde-carta); border:1px solid var(--filo);
-    padding:22px; position:relative;
+    padding:18px 18px 22px; position:relative;
     transition:border-color 0.25s, background-color 0.25s, transform 0.25s;
   }
   .card-esempio:hover, .card-esempio:focus-visible{border-color:var(--oro-fioco); background:var(--verde-carta-2); transform:translateY(-2px);}
   /* stesso problema di specificità di .riquadro.smaschera più sotto: qui si
      ripristinano tutte e quattro le transizioni con una specificità più alta. */
   .card-esempio.smaschera{transition:border-color 0.25s, background-color 0.25s, transform 0.25s, clip-path 1s cubic-bezier(.16,.8,.3,1);}
-  .card-esempio .cifra{position:absolute; top:10px; right:14px;}
+  .card-esempio .cifra{position:absolute; top:14px; right:18px; z-index:2;}
+  .card-esempio-testo{margin-top:20px;}
   .card-esempio h3{
     font-family:var(--serif); font-weight:600; font-size:1.24rem;
     line-height:1.2; margin-bottom:5px;
@@ -358,14 +347,45 @@
   }
   .card-esempio:hover .freccia, .card-esempio:focus-visible .freccia{gap:9px;}
 
-  /* mini-anteprima: screenshot reale del hero di ciascuna pagina esempio */
-  .mock{
-    background:var(--m-bg); border:1px solid var(--filo);
-    aspect-ratio:9/16; overflow:hidden;
-    transition:transform 0.3s;
+  /* finestra "da browser": barra sottile con pallini in oro/muschio (mai i
+     toni semaforo rosso/giallo/verde da sistema operativo) sopra
+     l'anteprima reale, così si legge come una vera schermata di sito. */
+  .finestra{margin-top:32px; border:1px solid var(--filo); background:var(--verde-ombra); transition:transform 0.3s;}
+  .card-esempio:hover .finestra, .card-esempio:focus-visible .finestra{transform:scale(1.015);}
+  .finestra-barra{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:8px 12px; background:var(--verde-carta-2); border-bottom:1px solid var(--filo);
   }
-  .card-esempio:hover .mock, .card-esempio:focus-visible .mock{transform:scale(1.04);}
-  .mock img{width:100%; height:100%; object-fit:cover; display:block;}
+  .finestra-pallini{display:flex; gap:5px;}
+  .finestra-pallini i{width:6px; height:6px; border-radius:50%; display:block;}
+  .finestra-pallini i:nth-child(1){background:var(--oro);}
+  .finestra-pallini i:nth-child(2){background:var(--muschio);}
+  .finestra-pallini i:nth-child(3){background:var(--oro-fioco);}
+  .finestra-indirizzo{
+    font-family:var(--mono); font-size:0.62rem; letter-spacing:0.02em;
+    color:var(--muschio); opacity:0.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+
+  /* anteprima reale: screenshot vero della pagina d'esempio, più alto della
+     finestra che lo inquadra — l'eccesso di altezza è ciò che permette il
+     pan lentissimo qui sotto, un respiro e non uno scroll frenetico. */
+  .mock{
+    background:var(--m-bg); overflow:hidden; position:relative;
+    height:240px;
+  }
+  @media(min-width:480px){ .mock{height:280px;} }
+  .mock img{
+    width:100%; height:auto; display:block;
+    position:absolute; top:0; left:0;
+    animation:mock-pan 16s ease-in-out infinite;
+  }
+  .mock-ristorante img{animation-duration:18s;}
+  .mock-parrucchiere img{animation-duration:13s;}
+  .mock-estetico img{animation-duration:20s;}
+  @keyframes mock-pan{
+    0%, 100%{transform:translateY(0);}
+    50%{transform:translateY(-14%);}
+  }
   .mock-ristorante{--m-bg:#18130f;}
   .mock-parrucchiere{--m-bg:#f4efe7;}
   .mock-estetico{--m-bg:#faf6f0;}
@@ -641,9 +661,6 @@
 <!-- Filo d'oro che riempie in proporzione allo scroll: vedi script in fondo -->
 <div id="barra-progresso" aria-hidden="true"><div id="barra-progresso-riempimento"></div></div>
 
-<!-- "Foglio X di 06": in quale area della pagina si trova chi legge, vedi script in fondo -->
-<div id="foglio" class="cifra" aria-hidden="true">01 / 06</div>
-
 <div class="scena">
 
 <!-- ==================================================== 1. APERTURA -->
@@ -755,10 +772,16 @@
       <a class="card-esempio cornice smaschera" href="esempi/ristorante.html">
         <span class="segno tl"></span><span class="segno tr"></span><span class="segno bl"></span><span class="segno br"></span>
         <span class="cifra">01</span>
-        <div class="mock mock-ristorante" aria-hidden="true">
-          <img src="immagini/anteprima-ristorante.png" alt="" width="184" height="327" loading="lazy">
+        <div class="finestra" aria-hidden="true">
+          <div class="finestra-barra">
+            <span class="finestra-pallini"><i></i><i></i><i></i></span>
+            <span class="finestra-indirizzo">trattoriadelponte.it</span>
+          </div>
+          <div class="mock mock-ristorante">
+            <img src="immagini/anteprima-ristorante.png" alt="" width="390" height="1300" loading="lazy">
+          </div>
         </div>
-        <div>
+        <div class="card-esempio-testo">
           <h3>Ristoranti e bar</h3>
           <p>Menù sempre aggiornabile, orari, prenotazione con un tocco.</p>
           <span class="freccia">Apri l'esempio →</span>
@@ -768,10 +791,16 @@
       <a class="card-esempio cornice smaschera" href="esempi/parrucchiere.html">
         <span class="segno tl"></span><span class="segno tr"></span><span class="segno bl"></span><span class="segno br"></span>
         <span class="cifra">02</span>
-        <div class="mock mock-parrucchiere" aria-hidden="true">
-          <img src="immagini/anteprima-parrucchiere.png" alt="" width="184" height="327" loading="lazy">
+        <div class="finestra" aria-hidden="true">
+          <div class="finestra-barra">
+            <span class="finestra-pallini"><i></i><i></i><i></i></span>
+            <span class="finestra-indirizzo">novehairstudio.it</span>
+          </div>
+          <div class="mock mock-parrucchiere">
+            <img src="immagini/anteprima-parrucchiere.png" alt="" width="390" height="1500" loading="lazy">
+          </div>
         </div>
-        <div>
+        <div class="card-esempio-testo">
           <h3>Parrucchieri</h3>
           <p>Listino chiaro, i tuoi lavori in evidenza, chiamata diretta.</p>
           <span class="freccia">Apri l'esempio →</span>
@@ -781,10 +810,16 @@
       <a class="card-esempio cornice smaschera" href="esempi/centro-estetico.html">
         <span class="segno tl"></span><span class="segno tr"></span><span class="segno bl"></span><span class="segno br"></span>
         <span class="cifra">03</span>
-        <div class="mock mock-estetico" aria-hidden="true">
-          <img src="immagini/anteprima-centro-estetico.png" alt="" width="184" height="327" loading="lazy">
+        <div class="finestra" aria-hidden="true">
+          <div class="finestra-barra">
+            <span class="finestra-pallini"><i></i><i></i><i></i></span>
+            <span class="finestra-indirizzo">biancaluna.it</span>
+          </div>
+          <div class="mock mock-estetico">
+            <img src="immagini/anteprima-centro-estetico.png" alt="" width="390" height="1500" loading="lazy">
+          </div>
         </div>
-        <div>
+        <div class="card-esempio-testo">
           <h3>Centri estetici</h3>
           <p>Trattamenti, pacchetti e prenotazione su WhatsApp.</p>
           <span class="freccia">Apri l'esempio →</span>
@@ -1037,33 +1072,6 @@
     aggiorna();
     window.addEventListener('scroll', richiedi, {passive: true});
     window.addEventListener('resize', richiedi);
-  })();
-
-  // Foglio X/06: in quale delle sei aree del documento si trova chi legge,
-  // nello stesso ordine in cui compaiono nella pagina. Una fascia stretta
-  // al centro del viewport (rootMargin -45%/-45%) fa da "linea di lettura":
-  // quando un'area la attraversa, aggiorna l'etichetta.
-  (function(){
-    var etichetta = document.getElementById('foglio');
-    if(!etichetta || !('IntersectionObserver' in window)) return;
-    var aree = [
-      document.querySelector('.apertura'),
-      document.getElementById('esempi'),
-      document.getElementById('prezzi'),
-      document.getElementById('come-funziona'),
-      document.getElementById('chi-sono'),
-      document.getElementById('contatti')
-    ].filter(Boolean);
-    if(aree.length !== 6) return;
-    function due(n){ return n < 10 ? '0' + n : '' + n; }
-    var osservatore = new IntersectionObserver(function(voci){
-      voci.forEach(function(voce){
-        if(!voce.isIntersecting) return;
-        var indice = aree.indexOf(voce.target);
-        if(indice > -1) etichetta.textContent = due(indice + 1) + ' / 06';
-      });
-    }, {threshold: 0, rootMargin: '-45% 0px -45% 0px'});
-    aree.forEach(function(el){ osservatore.observe(el); });
   })();
 
   // Ogni pannello marcato .reveal o .smaschera entra una volta sola quando
