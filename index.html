@@ -127,6 +127,24 @@
     opacity:0.045; mix-blend-mode:overlay;
   }
 
+  /* ------------------------------------------------------- alone al cursore
+     Luce dorata morbida che segue il puntatore su tutta la pagina — solo su
+     schermi con puntatore preciso (vedi guardia hover:hover/pointer:fine
+     nello script in fondo, lo stesso identico pattern già usato per
+     l'inclinazione dell'illustrazione e il pulsante magnetico). Con motion
+     ridotto o su touch l'elemento non viene proprio creato: niente qui sotto
+     entra mai in gioco in quei casi. In blend mode "screen" così schiarisce
+     appena senza mai scurire, sopra la grana come la grana è sopra al resto
+     — la stessa idea di velo, non una macchia opaca. Aggiornata via
+     requestAnimationFrame nello script, mai ad ogni mousemove.
+     --------------------------------------------------------------------- */
+  #alone{
+    position:fixed; inset:0; z-index:520; pointer-events:none;
+    opacity:0; mix-blend-mode:screen; transition:opacity 0.5s ease;
+    background:radial-gradient(circle 380px at var(--alone-x, 50%) var(--alone-y, 50%), rgba(217,185,111,0.08), transparent 72%);
+  }
+  #alone.attivo{opacity:1;}
+
   /* ------------------------------------------------- barra di avanzamento
      Filo d'oro in cima al viewport, aggiornato 1:1 con lo scroll (vedi
      script in fondo). Non è un'animazione ambientale ma un indicatore
@@ -135,6 +153,37 @@
      --------------------------------------------------------------------- */
   #barra-progresso{position:fixed; top:0; left:0; right:0; height:2px; z-index:400; pointer-events:none;}
   #barra-progresso-riempimento{width:100%; height:100%; background:var(--oro); transform:scaleX(0); transform-origin:0 0;}
+
+  /* --------------------------------------------------- percorso nella valle
+     Filo sottile che scende lungo tutta l'altezza della pagina, dall'apertura
+     fino ai contatti: a differenza della barra in cima, NON è fixed — vive
+     nel flusso normale del documento (posizionato in absolute rispetto a
+     .scena, che lo contiene; altezza calcolata via script sull'estensione
+     reale del contenuto) e scorre insieme al resto della pagina, come un
+     filo cucito lungo il margine. Resta dentro la fascia di rispetto di
+     .wrap (22px) per non attraversare mai testo o pannelli, quindi legge
+     sempre sullo stesso sfondo scuro di base, qualunque sezione attraversi.
+     Il punto segue lo scroll 1:1 (vedi script in fondo): come la barra in
+     cima, quel posizionamento resta fuori da prefers-reduced-motion; solo
+     il suo bagliore pulsante (qui sotto) rientra nella regola generale già
+     dichiarata a inizio file.
+     --------------------------------------------------------------------- */
+  .percorso{position:absolute; top:0; left:4px; width:16px; height:0; pointer-events:none;}
+  .percorso svg{width:100%; height:100%; overflow:visible; display:block;}
+  .percorso-linea{fill:none; stroke:var(--oro); stroke-width:1.2; opacity:0.45; vector-effect:non-scaling-stroke;}
+  /* Il punto è un <div> vero, non un <circle> dentro l'SVG: l'SVG ha uno
+     stretch non uniforme (preserveAspectRatio="none", per adattare lo stesso
+     tracciato a qualunque altezza di pagina) che schiaccerebbe un cerchio in
+     un'ellisse. Lo script converte le coordinate di getPointAtLength() in
+     pixel reali e posiziona questo div di conseguenza, restando sempre un
+     punto rotondo. */
+  .percorso-punto{
+    position:absolute; top:0; left:0; width:7px; height:7px; margin:-3.5px 0 0 -3.5px;
+    border-radius:50%; background:var(--oro-chiaro);
+    box-shadow:0 0 4px 1px var(--oro), 0 0 9px 3px rgba(217,185,111,0.45);
+    animation:percorso-pulsa 2.8s ease-in-out infinite;
+  }
+  @keyframes percorso-pulsa{ 0%,100%{opacity:0.8; transform:scale(1);} 50%{opacity:1; transform:scale(1.15);} }
 
   .scena{position:relative; z-index:1;}
 
@@ -662,6 +711,16 @@
 
 <div class="scena">
 
+<!-- Percorso nella valle: filo che scende dall'apertura ai contatti, nel
+     flusso normale del documento (non fixed). Altezza e punto sono calcolati
+     via script in fondo, sulla percentuale di scroll dell'intera pagina. -->
+<div class="percorso" id="percorso" aria-hidden="true">
+  <svg id="percorso-svg" viewBox="0 0 16 1000" preserveAspectRatio="none">
+    <path id="percorso-linea" class="percorso-linea" d="M8,0 C14,120 2,260 8,380 S14,560 8,680 S2,860 8,1000"/>
+  </svg>
+  <div id="percorso-punto" class="percorso-punto"></div>
+</div>
+
 <!-- ==================================================== 1. APERTURA -->
 <header class="apertura">
   <div class="wrap apertura-int">
@@ -1060,6 +1119,64 @@
     window.addEventListener('resize', richiedi);
   })();
 
+  // Percorso nella valle: il filo vive nel flusso normale del documento (non
+  // fixed, a differenza della barra qui sopra); il contenitore viene
+  // dimensionato per coprire esattamente lo spazio tra l'inizio
+  // dell'apertura e la fine dei contatti. Il punto avanza sul tracciato con
+  // getPointAtLength(), così segue davvero le curve del path invece di una
+  // semplice interpolazione lineare, sulla stessa percentuale di scroll
+  // dell'intera pagina usata sopra (0% in cima, 100% in fondo) — per questo
+  // anche qui il posizionamento resta fuori da prefers-reduced-motion; solo
+  // il bagliore pulsante del punto (in CSS) rientra nella regola generale.
+  (function(){
+    var contenitore = document.getElementById('percorso');
+    var svg = document.getElementById('percorso-svg');
+    var linea = document.getElementById('percorso-linea');
+    var punto = document.getElementById('percorso-punto');
+    var apertura = document.querySelector('.apertura');
+    var contatti = document.getElementById('contatti');
+    if(!contenitore || !svg || !linea || !punto || !apertura || !contatti || typeof linea.getTotalLength !== 'function') return;
+
+    var lunghezza = linea.getTotalLength();
+    // Larghezza/altezza del viewBox: servono per convertire le coordinate di
+    // getPointAtLength() (nello spazio del path) in pixel reali del div del
+    // punto, che vive fuori dall'SVG apposta per non subire lo stretch non
+    // uniforme di preserveAspectRatio="none" (altrimenti un cerchio diventa
+    // un'ellisse quando il contenitore è molto più alto che largo).
+    var vbLarghezza = svg.viewBox.baseVal.width;
+    var vbAltezza = svg.viewBox.baseVal.height;
+    var pronto = true;
+
+    function dimensiona(){
+      var altezza = (contatti.offsetTop + contatti.offsetHeight) - apertura.offsetTop;
+      contenitore.style.top = apertura.offsetTop + 'px';
+      contenitore.style.height = Math.max(0, altezza) + 'px';
+    }
+    function aggiorna(){
+      var doc = document.documentElement;
+      var scorribile = doc.scrollHeight - doc.clientHeight;
+      var rapporto = scorribile > 0 ? (window.scrollY || doc.scrollTop) / scorribile : 0;
+      rapporto = Math.min(1, Math.max(0, rapporto));
+      var p = linea.getPointAtLength(rapporto * lunghezza);
+      var scalaX = contenitore.offsetWidth / vbLarghezza;
+      var scalaY = contenitore.offsetHeight / vbAltezza;
+      punto.style.left = (p.x * scalaX) + 'px';
+      punto.style.top = (p.y * scalaY) + 'px';
+      pronto = true;
+    }
+    function richiedi(){
+      if(!pronto) return;
+      pronto = false;
+      requestAnimationFrame(aggiorna);
+    }
+
+    dimensiona();
+    aggiorna();
+    window.addEventListener('scroll', richiedi, {passive: true});
+    window.addEventListener('resize', function(){ dimensiona(); richiedi(); });
+    window.addEventListener('load', dimensiona);
+  })();
+
   // Ogni pannello marcato .reveal o .smaschera entra una volta sola quando
   // arriva a schermo. Un solo osservatore per tutta la pagina, non uno per
   // elemento: cambia solo la transizione CSS che ciascuna classe usa.
@@ -1236,6 +1353,47 @@
       });
       azioni.addEventListener('mouseleave', function(){ btn.style.transform = ''; });
     }
+  })();
+
+  // Alone al cursore: stessa guardia hover:hover/pointer:fine e stesso
+  // controllo di motion ridotto dell'IIFE qui sopra — su touch, o con il
+  // motion ridotto, questo elemento non viene proprio creato (come il
+  // sipario in apertura: se lo script non parte, non esiste mai nel DOM).
+  // Segue il cursore su tutta la pagina, non solo nell'apertura, aggiornato
+  // con requestAnimationFrame — stesso schema "pronto" della barra di
+  // avanzamento, mai un mousemove libero senza throttling.
+  (function(){
+    if(!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches)) return;
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var alone = document.createElement('div');
+    alone.id = 'alone';
+    alone.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(alone);
+
+    var x = window.innerWidth / 2;
+    var y = window.innerHeight / 2;
+    var pronto = true;
+    function aggiorna(){
+      alone.style.setProperty('--alone-x', x + 'px');
+      alone.style.setProperty('--alone-y', y + 'px');
+      pronto = true;
+    }
+    function richiedi(){
+      if(!pronto) return;
+      pronto = false;
+      requestAnimationFrame(aggiorna);
+    }
+
+    window.addEventListener('mousemove', function(e){
+      x = e.clientX;
+      y = e.clientY;
+      alone.classList.add('attivo');
+      richiedi();
+    }, {passive: true});
+    document.addEventListener('mouseleave', function(){
+      alone.classList.remove('attivo');
+    });
   })();
 </script>
 
