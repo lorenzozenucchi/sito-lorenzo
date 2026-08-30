@@ -316,10 +316,19 @@
   }
   @media(min-width:900px){ .promo-hero{text-align:left;} }
 
+  /* Sotto i 900px l'illustrazione arriva a piena larghezza dopo il teaser
+     prezzo e le icone categoria, subito prima di #esempi: sproporzionata in
+     quella posizione, e le prove vere del lavoro sono le tre card più sotto.
+     Nascosta di default (mobile-first) e ripristinata, invariata, dentro lo
+     stesso @media(min-width:900px) già usato per il resto dell'apertura —
+     nessun nuovo breakpoint. Resta nel markup anche da nascosta: il tilt al
+     mouse più in fondo al file continua a trovare l'elemento, semplicemente
+     non riceve mai eventi da un elemento display:none. */
   .apertura-illo{
+    display:none;
     margin-top:52px; animation:salgo 1s cubic-bezier(.16,.8,.3,1) .5s both;
   }
-  @media(min-width:900px){ .apertura-illo{margin-top:0;} }
+  @media(min-width:900px){ .apertura-illo{display:block; margin-top:0;} }
   /* profondità al gesto: inclinazione dell'illustrazione, solo dove esiste
      un puntatore preciso — su touch questa regola non incontra mai un
      listener JS che le dia un valore diverso da quello di riposo. */
@@ -424,18 +433,38 @@
   }
   @media(min-width:480px){ .mock{height:280px;} }
   .mock img{
+    --pan:-14%;
     width:100%; height:auto; display:block;
     position:absolute; top:0; left:0;
     animation:mock-pan 16s ease-in-out infinite;
   }
-  .mock-ristorante img{animation-duration:18s;}
-  .mock-parrucchiere img{animation-duration:13s;}
-  .mock-estetico img{animation-duration:20s;}
+  /* Le tre card condividono un'unica animation-duration (16s, ereditata da
+     qui: nessuna delle tre la sovrascrive più). Con durate diverse (18s/13s/
+     20s) le card andavano fuori fase l'una dall'altra: in un dato istante
+     una poteva trovarsi a metà pan mentre le altre erano ferme sul
+     fotogramma pulito. Sincronizzate, sono sempre nello stesso punto del
+     ciclo — non serve più chiedersi "quale card, in quel momento".
+     L'ampiezza del pan (--pan) è invece diversa per la card ristorante: il
+     suo screenshot sorgente (390×910) è molto più corto di quello delle
+     altre due (390×1500 entrambi), quindi lo stesso -14% usato per tutte
+     cadeva a metà del titolo "Il sapore vero della valle." invece di
+     superarlo — non un problema di fase ma di proporzioni fra immagini di
+     altezza diversa. */
   @keyframes mock-pan{
-    0%, 100%{transform:translateY(0);}
-    50%{transform:translateY(-14%);}
+    /* Il pan resta lento quanto prima (commit c24f423): a cambiare è solo
+       come si distribuisce nel ciclo. Il fotogramma pulito dall'alto
+       (translateY(0)) e quello pulito in basso (translateY(var(--pan)))
+       occupano insieme l'88% del ciclo; la discesa e la risalita — l'unico
+       tratto in cui un titolo vicino al bordo superiore dello screenshot
+       potrebbe apparire a metà — durano il 6% ciascuna, circa un secondo su
+       16: un passaggio, non una sosta. */
+    0%, 44%{transform:translateY(0);}
+    50%{transform:translateY(var(--pan));}
+    88%{transform:translateY(var(--pan));}
+    94%, 100%{transform:translateY(0);}
   }
   .mock-ristorante{--m-bg:#18130f;}
+  .mock-ristorante img{--pan:-36%;}
   .mock-parrucchiere{--m-bg:#f4efe7;}
   .mock-estetico{--m-bg:#faf6f0;}
 
@@ -731,7 +760,7 @@
       <div class="filo-oro"></div>
 
       <p class="payoff">La tua attività.<br>Online come merita.</p>
-      <p class="intro">Siti web e presenza digitale per le attività locali della Val Seriana.</p>
+      <p class="intro">Siti web e scheda Google per le attività locali della Val Seriana.</p>
 
       <div class="azioni">
         <a class="btn btn-oro" href="#esempi">Guarda com'è un sito fatto bene</a>
@@ -822,7 +851,7 @@
 <!-- ====================================== 2. COME POTREBBE ESSERE IL TUO -->
 <section class="sez" id="esempi">
   <div class="wrap">
-    <p class="occhiello reveal">Il tuo sito</p>
+    <p class="occhiello reveal">Esempi</p>
     <h2 class="reveal">Tre esempi, <em>fatti da me</em></h2>
     <p class="sez-sub reveal">Non sono immagini: sono pagine vere, si aprono e si scorrono col dito. Guardale dal telefono, è così che le vedranno i tuoi clienti. Attività inventate, siti veri.</p>
 
@@ -889,9 +918,8 @@
          Quando ci saranno gli esempi per B&B, negozi e studi professionali,
          sostituisci questo blocco con altre tre schede uguali a quelle sopra. -->
     <p class="nota-categorie reveal">
-      Lavoro anche per <strong>B&amp;B, negozi e studi professionali</strong>, ma l'esempio
-      online per queste categorie non l'ho ancora preparato. Se la tua attività è di
-      un altro tipo, <a href="#contatti">scrivimi</a> e te ne preparo uno su misura.
+      Lavoro anche per <strong>B&amp;B, negozi e studi professionali</strong>:
+      <a href="#contatti">scrivimi</a> e te ne preparo uno su misura.
     </p>
   </div>
 </section>

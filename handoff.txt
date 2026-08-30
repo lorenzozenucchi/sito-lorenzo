@@ -1,18 +1,124 @@
 ================================================================================
-CLAUDE.md — riga obsoleta sull'indicatore #foglio, mai rimosso
+Quattro correzioni su index.html — apertura, occhiello esempi, card 02, nota B&B
 ================================================================================
 
-Correzione minima e isolata. Nella riga ~92 di CLAUDE.md c'è ancora:
+CONTESTO
+--------
+Progetto: ~/locali/sito-lorenzo (repo Git locale, ultimo commit 479fdc0).
+File unico coinvolto: index.html. Le pagine in esempi/ (ristorante.html,
+parrucchiere.html, centro-estetico.html) NON vanno toccate: hanno un'identità
+visiva propria e indipendente da quella della home (vedi CLAUDE.md).
 
-  "un'etichetta mono "X / 06" in alto a destra (`#foglio`) segnala in quale
-  delle sei aree della pagina si trova chi legge;"
+Il breakpoint mobile/desktop usato ovunque nel file è @media(min-width:900px)
+(sotto: mobile a colonna singola; sopra: .apertura-int diventa una grid a due
+colonne, riga 256-258).
 
-Quell'elemento è stato rimosso da index.html nel commit c24f423 (task
-"Rimuove l'indicatore foglio X/Y"): non esiste più nel file. Rimuovi questa
-riga da CLAUDE.md. Se è un elemento di un elenco puntato, verifica che la
-punteggiatura/struttura della lista resti corretta dopo averla tolta (virgola
-o punto e virgola finale della riga precedente, se necessario).
+RUOLO
+-----
+Sei l'esecutore del progetto. Il task è già deciso, non rimetterlo in
+discussione.
 
-Non toccare nient'altro in CLAUDE.md né in nessun altro file. Nessuna
-catena di revisione per una correzione di questa portata. Non fare commit
-né push.
+OBIETTIVO
+---------
+Quattro correzioni indipendenti, tutte dentro index.html.
+
+1. NASCONDERE L'ILLUSTRAZIONE SOTTO I 900PX
+   Il blocco `.apertura-illo` (l'illustrazione SVG a tratto in apertura,
+   righe 777-817 circa) oggi resta visibile a ogni larghezza, con solo un
+   `margin-top` diverso sopra i 900px (riga 320-322). Sotto i 900px, dentro
+   la colonna singola dell'header, si piazza dopo il teaser di prezzo
+   (`.promo-hero`, "390 €, prezzo di lancio...") e le icone categoria, subito
+   prima della sezione #esempi: in quella posizione, a piena larghezza di
+   schermo, risulta sproporzionata e non aggiunge nulla — le prove vere del
+   lavoro sono le tre card con mockup più sotto.
+   Fatto quando: sotto i 900px `.apertura-illo` non è più visibile (es. media
+   query dedicata sotto quella soglia). Sopra i 900px resta invariata. Non
+   deve lasciare un vuoto/spaziatura anomala nella colonna mobile dell'header
+   né rompere il tilt al passaggio del mouse che la riguarda sopra i 900px
+   (script in fondo al file, cerca `.apertura-illo`).
+
+2. TESTO INTRO: "PRESENZA DIGITALE" NON DICE NIENTE
+   Riga 734, paragrafo `.intro`:
+     "Siti web e presenza digitale per le attività locali della Val Seriana."
+   Sostituiscilo con:
+     "Siti web e scheda Google per le attività locali della Val Seriana."
+   ("Scheda Google" è già il servizio reale descritto più sotto nel listino:
+   "Mappa, orari e recensioni Google in pagina" e "Scheda Google curata ogni
+   mese" — non è un'invenzione, è coerente con l'offerta.)
+
+3. ALLINEARE OCCHIELLO E TITOLO DELLA SEZIONE ESEMPI
+   Riga 825: `<p class="occhiello reveal">Il tuo sito</p>`, subito seguito
+   dall'h2 "Tre esempi, fatti da me". I due non si parlano: è un residuo del
+   titolo di lavorazione della sezione (il commento HTML sopra l'header dice
+   ancora "COME POTREBBE ESSERE IL TUO", riga 98) mai aggiornato quando l'h2
+   è stato cambiato in "Tre esempi, fatti da me" nella ripulitura del
+   30/08/2026.
+   Nelle altre quattro sezioni della pagina l'occhiello è sempre un'etichetta
+   piatta che ripete il tema (Quanto costa / Come funziona / Chi sono /
+   Contatti), mentre l'h2 porta la frase a effetto: applica lo stesso schema
+   qui. Cambia l'occhiello in "Esempi".
+   Fatto quando: l'occhiello dice "Esempi" e non c'è più alcun riferimento a
+   "il tuo sito" in quel punto.
+
+4. CARD 02 (PARRUCCHIERE): IL TITOLO "TAGLIO." APPARE TAGLIATO A METÀ
+   Diagnosi, con il metodo usato per arrivarci: lo screenshot sorgente
+   (immagini/anteprima-parrucchiere.png, 390×1500) NON ha nulla di rotto —
+   letto per intero, "TAGLIO. COLORE. CARATTERE." è visibile pulito. Il
+   difetto è nel pan verticale della card (.mock img, righe 426-434): tutte
+   e tre le card oscillano fra `translateY(0)` e `translateY(-14%)` con lo
+   stesso ciclo, ma con `animation-duration` diversa e non sincronizzata
+   (18s ristorante, 13s parrucchiere, 20s estetico — righe 431-433). Perché
+   il ciclo della 02 è il più corto, in un dato istante è quella con più
+   probabilità di trovarsi a metà pan invece che vicino al fotogramma
+   iniziale: quando ci si trova, la finestra (240-280px di altezza) mostra
+   la parte bassa di "TAGLIO." con la parte alta già scorsa fuori dall'alto
+   — esattamente l'effetto "tagliata in alto, mezzo fuori" segnalato. La 01
+   (ciclo più lungo) capita più spesso vicino al fotogramma pulito, ma non
+   è garantito neanche per lei: è un problema di fase, non di quella
+   singola card.
+   Obiettivo: la card 02 (e, per lo stesso motivo, anche 01 e 03) deve
+   mostrare in modo affidabile l'inquadratura pulita dall'alto per la
+   maggior parte del tempo — non deve mai capitare che un titolo o un'altra
+   scritta della pagina d'esempio resti tagliata a metà proprio sul bordo
+   superiore della finestra. L'effetto di pan lento va mantenuto (è voluto,
+   commit c24f423): il problema da risolvere è la fase imprevedibile fra le
+   tre card, non l'animazione in sé. Il metodo esatto (sincronizzare le tre
+   durate, oppure far sostare l'animazione più a lungo sul fotogramma
+   iniziale prima di scendere, o altro) lo scegli tu.
+   Fatto quando: con Playwright, screenshot della sezione #esempi presi ad
+   almeno 4 istanti diversi coperti da un ciclo completo (es. t=0s, 5s, 10s,
+   15s) mostrano sempre le tre card con l'inquadratura pulita dall'alto,
+   senza titoli o scritte tagliate a metà sul bordo superiore della
+   finestra, su nessuna delle tre.
+
+5. NOTA SU B&B, NEGOZI E PROFESSIONISTI
+   Righe 167-171, dentro la sezione #esempi:
+     "Lavoro anche per <strong>B&amp;B, negozi e studi professionali</strong>,
+     ma l'esempio online per queste categorie non l'ho ancora preparato. Se
+     la tua attività è di un altro tipo, <a href="#contatti">scrivimi</a> e
+     te ne preparo uno su misura."
+   "Non l'ho ancora preparato" mette Lorenzo in difetto senza motivo: nessuno
+   si aspetta un esempio per ogni categoria possibile. Sostituisci con:
+     "Lavoro anche per <strong>B&amp;B, negozi e studi professionali</strong>:
+     <a href="#contatti">scrivimi</a> e te ne preparo uno su misura."
+   Fatto quando: il paragrafo dice questo e non contiene più alcuna frase
+   che si scusa per un esempio mancante. Il commento HTML sopra (riga
+   164-166, su come sostituire il blocco quando arriveranno gli esempi
+   veri) resta invariato: è ancora valido.
+
+VINCOLI
+-------
+- Non toccare esempi/ristorante.html, esempi/parrucchiere.html,
+  esempi/centro-estetico.html: la loro identità visiva è indipendente da
+  quella della home, per scelta esplicita già presa.
+- Non toccare le altre sezioni della pagina (prezzi, come funziona, chi
+  sono, contatti) né il resto del CSS oltre a quanto necessario per i punti
+  1 e 4.
+- Punto 4: non sostituire né ritagliare di nuovo i file PNG in immagini/ — lo
+  screenshot sorgente è corretto, il problema è nell'animazione CSS, non
+  nell'immagine.
+- Punto 1: la soluzione deve restare dentro le media query esistenti basate
+  su 900px, senza introdurre un secondo breakpoint diverso per lo stesso
+  scopo.
+- Se emerge un dubbio bloccante non coperto da queste istruzioni, fermati e
+  chiedi invece di improvvisare.
