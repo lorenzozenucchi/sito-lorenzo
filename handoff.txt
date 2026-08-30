@@ -1,91 +1,115 @@
 ================================================================================
-LE CARD ESEMPIO — ribaltate: grandi, vere, con un accenno di movimento
+QUATTRO DETTAGLI NUOVI — barra di progresso, foglio X/Y, prezzo che si
+cancella disegnandosi, sigillo finale
 ================================================================================
 
-Decisione di Lorenzo, esplicita e definitiva: si ribalta la scelta del task
-precedente. Le tre card della sezione "Come potrebbe essere" (id="esempi")
-oggi mostrano un dettaglio astratto e minuscolo apposta per non svelare
-nulla (frammenti di colore/texture, 88-92px). Si passa alla direzione
-opposta: card grandi, quasi "mini-browser", con un'anteprima vera e viva
-del sito — mostrare, non nascondere. Non è un'estensione del task
-precedente, è la sua inversione: le immagini attuali in
-`immagini/anteprima-*.png` vanno sostituite, non affiancate.
+Quattro aggiunte separate, tutte piccole per costo ma pensate per l'effetto,
+tutte riusano il linguaggio già stabilito del sito (dossier tecnico, oro su
+verde, monospace per i dati, segni ad angolo) — nessuna introduce uno stile
+nuovo. Puoi farle nell'ordine che preferisci, ma verificale una per una:
+sono quattro piccoli meccanismi indipendenti, un bug in uno non deve
+affossare gli altri tre.
 
-## OBIETTIVO
+## CONTESTO IMPORTANTE su cosa esiste oggi e cosa no
 
-**1. Nuovi screenshot, più alti e più veri.** Con Playwright (funzionante
-per davvero), cattura per ciascuna delle tre pagine in `esempi/` uno
-screenshot più alto di prima — non solo il hero, ma hero + la sezione
-successiva (menu/listino/trattamenti), abbastanza materiale perché dentro la
-card si veda davvero scorrere qualcosa di riconoscibile: titoli, blocchi,
-colore, struttura — non serve che il testo sia leggibile per intero, ma la
-pagina deve sembrare viva e vera, non un dettaglio isolato. Salva le nuove
-immagini (stessi nomi in `immagini/anteprima-*.png`, sostituendo le
-precedenti, oppure nomi nuovi se preferisci — verifica poi che nessun
-riferimento resti rotto). Peso ragionevole per immagini più grandi e più
-importanti nel layout: qualche centinaio di KB è accettabile qui, a
-differenza delle miniature di prima — ma resta comunque ottimizzato,
-verificalo.
+La tecnica di "disegno tratto per tratto" (basata su `getTotalLength()` e
+`stroke-dashoffset`) che animava l'illustrazione d'apertura NON esiste più
+nel file: è stata rimossa quando l'illustrazione è diventata un'immagine
+raster vera (task precedente). L'obiettivo 3 qui sotto NON è un riuso di
+quella tecnica — è una costruzione nuova, che applica la stessa IDEA
+(un tratto SVG che si disegna) a un elemento diverso. Non cercare codice
+esistente da riattivare: non c'è.
 
-**2. Card molto più grandi**, che dominano la sezione invece di essere un
-elemento fra tanti. La struttura oggi è una griglia con miniatura piccola a
-sinistra e testo a destra: cambia in un'anteprima che occupa quasi tutta la
-larghezza della card, in alto, ben più alta di prima (non un rettangolo di
-92px — qualcosa che si legga come una vera finestra su un sito, con
-un'altezza sostanziale), e sotto titolo, descrizione, freccia — impilato
-verticalmente, non più affiancato. Su schermi larghi puoi mantenere le tre
-card affiancate se restano comunque sostanziose, oppure impilarle anche lì:
-scegli tu in base a come rende meglio "grande", non "tre miniature vicine".
+## OBIETTIVO 1 — Barra di avanzamento a filo d'oro
 
-**3. Una cornice da "finestra di sito"**, non solo un bordo. Sopra
-l'anteprima, una barra sottile che evochi la barra di un browser — tre
-piccoli pallini (nello stile del sito: toni oro/verde-muschio, MAI i colori
-letterali rosso/giallo/verde da sistema operativo, stonerebbero con la
-palette) e, se resta naturale, un accenno testuale del tipo un indirizzo
-web finto e coerente col nome di fantasia della pagina (es. per la
-trattoria qualcosa come "trattoriadelponte.it", in un carattere piccolo e
-smorzato, chiaramente parte della cornice decorativa e non un link vero).
-Facoltativo se non trovi un'esecuzione pulita — la barra con i pallini è la
-parte che conta di più.
+Un filo sottile (1-2px), fisso in cima al viewport, che si riempie da
+sinistra a destra in proporzione allo scroll della pagina (0% in cima, 100%
+in fondo). Colore `var(--oro)`, altezza minima, nessun'ombra o decorazione
+aggiuntiva — è un filo, non una barra colorata da app. Aggiornalo con
+`requestAnimationFrame` legato all'evento scroll, non un timer fisso. Non è
+soggetto a `prefers-reduced-motion`: è un indicatore funzionale ancorato 1:1
+alla posizione di scroll, non un'animazione ambientale — si muove solo
+quando l'utente scorre, mai da sola.
 
-**4. Il sito "si muove leggermente da solo" dentro la finestra.** Dentro la
-cornice, l'immagine (più alta della finestra visibile) scorre lentissima
-avanti e indietro con un pan verticale via CSS (`transform: translateY`
-animato, non JavaScript) — un ciclo lungo (12-20 secondi), ease-in-out,
-loop infinito. Deve sembrare un respiro, non uno scroll frenetico: se lo
-guardi per tre secondi a malapena te ne accorgi, se aspetti di più vedi che
-la pagina è scorsa. Rispetta `prefers-reduced-motion` (la regola globale
-del sito già azzera le durate delle animazioni: verifica che si applichi
-anche a questa, che è nuova).
+## OBIETTIVO 2 — Indicatore "foglio X di Y"
 
-**5. Le etichette sotto il titolo**, oggi una frase discorsiva per card
-("Menù sempre aggiornabile, orari, prenotazione con un tocco."): valuta se
-trasformarle in tag brevi separati da un punto, in monospace come le altre
-etichette tecniche del sito (es. "MENÙ · ORARI · PRENOTAZIONE") — più
-coerente con l'identità a dossier, più leggibile a colpo d'occhio. Se la
-frase discorsiva funziona meglio in un caso specifico, non forzare il
-cambio: usa giudizio.
+Un'etichetta piccola, fissa in un angolo dello schermo (scegli l'angolo che
+non entra mai in conflitto con la barra fissa Chiama/WhatsApp che compare
+sul telefono sotto i 760px — verificalo con Playwright, non a intuito), in
+monospace, stile `.cifra` già in uso per gli esempi e i passi (colore oro,
+lettere piccole). Mostra un conteggio tipo "03 / 06" che riflette in quale
+delle sei "aree" della pagina si trova il lettore in quel momento: apertura,
+esempi, prezzi, come funziona, chi sono, contatti — nello stesso ordine in
+cui compaiono nel documento. Aggiorna il numero mentre si scorre (va bene
+un IntersectionObserver sulle sezioni, soglia bassa, o il confronto della
+posizione dello scroll con i confini di ciascuna sezione — scegli tu il
+metodo più pulito). Non deve mai sovrapporsi ad altri elementi fissi: se il
+telefono è troppo stretto per farlo stare senza collidere con la barra
+Chiama/WhatsApp, nascondilo sotto i 760px piuttosto che farlo sovrapporre.
 
-Mantieni: i segni ad angolo (`.cornice`, `.segno`), il numero `.cifra`
-(01/02/03), la freccia "Apri l'esempio →", il link alla pagina vera, la
-rivelazione `.smaschera` allo scroll della card intera.
+## OBIETTIVO 3 — Il prezzo di 490 € che si cancella disegnandosi
 
-Nessuna modifica a `CLAUDE.md`.
+Oggi "490 €" (classe `.prezzo-vecchio`, dentro il BLOCCO PROMO della
+sezione prezzi) è barrato con un semplice `text-decoration:line-through`
+statico. Sostituiscilo con un tratto SVG vero, sovrapposto al testo, che si
+disegna da sinistra a destra quando il riquadro prezzo entra a schermo (lega
+l'animazione alla stessa rivelazione già esistente di quel riquadro — è già
+`.smaschera`, quindi il momento "entra a schermo" è già gestito altrove: usa
+quello stesso trigger, non inventarne uno nuovo). Il tratto non dev'essere
+perfettamente dritto e meccanico: una leggera imperfezione organica (una
+curva di Bézier con un piccolo scarto, non una linea retta millimetrica) fa
+sembrare un vero segno a penna su un documento di lavoro, coerente con
+l'idea di dossier — non un'animazione da interfaccia. Rimuovi la
+`text-decoration` statica quando aggiungi questo, non farle convivere.
+Rispetta `prefers-reduced-motion`: con il motion ridotto il tratto compare
+già disegnato (stato finale), non fermo a metà.
+
+## OBIETTIVO 4 — Un sigillo nel footer
+
+Il footer oggi è solo testo. Aggiungi un piccolo elemento grafico — un
+sigillo o timbro, non un'illustrazione grande: può essere un piccolo cerchio
+o rettangolo con un monogramma "LZ" o un riuso in scala ridotta del motivo
+dei segni ad angolo già usato altrove — che compare quando il footer entra
+a schermo con un piccolo gesto d'impatto (una breve contrazione di scala
+seguita da un assestamento, come un timbro che colpisce la carta), non una
+semplice dissolvenza. È il gesto di chiusura che fa da controparte al
+sipario d'apertura: la pagina si apre con un gesto, si chiude con un altro.
+Resta piccolo e restrained: è un dettaglio finale, non un nuovo elemento
+protagonista.
+
+## DOCUMENTAZIONE
+
+Aggiungi una breve nota in `CLAUDE.md`, nella sezione sull'identità visiva,
+che elenchi questi quattro dettagli come parte del linguaggio del sito (una
+riga per ciascuno, non un paragrafo lungo).
+
+Nessuna catena di revisione per questo task: verifica tu stesso con
+attenzione (vedi la sezione VERIFICA sotto) e riporta l'esito a Lorenzo.
 
 ## VERIFICA
 
-Con Playwright: screenshot della sezione esempi su telefono e desktop, e
-una cattura a distanza di qualche secondo per confermare che il pan sia
-visibile ma lento (non uno scatto). Conferma che il link di ciascuna card
-porti ancora alla pagina giusta e che `esempi/*.html` non sia stato toccato.
+Con Playwright, per ciascuno dei quattro punti, su telefono stretto e
+desktop:
+  - la barra di avanzamento riflette davvero lo scroll (controllo a inizio,
+    metà e fine pagina);
+  - il "foglio X/Y" cambia scorrendo e non si sovrappone mai alla barra
+    fissa Chiama/WhatsApp;
+  - il tratto sul 490 € si disegna al momento giusto e sparisce la vecchia
+    decorazione statica;
+  - il sigillo compare solo quando il footer è visibile, non prima.
+  - tutte le nuove animazioni rispettano `prefers-reduced-motion` tranne la
+    barra di avanzamento (punto 1), che è intenzionalmente esclusa.
 
 ## VINCOLI
 
-  - Non toccare il contenuto delle tre pagine in `esempi/`: solo catturarle,
-    più in alto di prima.
-  - Non toccare testi, prezzi, ordine delle sezioni, icone di categoria,
-    illustrazione d'apertura, grana, sipario, effetti al gesto, il
-    segnaposto "chi sono", la riga "nessun vincolo di durata".
-  - Non toccare `riferimenti/`, `foto/`, `demo-factory/`, `produzione/`.
+  - Non toccare testi, prezzi (le CIFRE, solo la presentazione del 490 €
+    cambia), ordine delle sezioni, icone di categoria, illustrazione
+    d'apertura, grana, sipario esistente, effetti al gesto già presenti, le
+    card esempio, il segnaposto "chi sono", la riga "nessun vincolo di
+    durata".
+  - Nessuna libreria esterna: SVG e CSS/JS nativi, come tutto il resto del
+    sito.
+  - Non toccare `esempi/`, `immagini/`, `riferimenti/`, `foto/`,
+    `demo-factory/`, `produzione/`.
   - Non fare commit né push.
   - Dubbio bloccante: fermati e fai UNA domanda mirata a Lorenzo.

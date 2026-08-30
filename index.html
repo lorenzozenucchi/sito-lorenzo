@@ -127,6 +127,27 @@
     opacity:0.045; mix-blend-mode:overlay;
   }
 
+  /* ------------------------------------------------- barra di avanzamento
+     Filo d'oro in cima al viewport, aggiornato 1:1 con lo scroll (vedi
+     script in fondo). Non è un'animazione ambientale ma un indicatore
+     funzionale: si muove solo quando l'utente scorre, mai da sola — per
+     questo resta fuori da prefers-reduced-motion.
+     --------------------------------------------------------------------- */
+  #barra-progresso{position:fixed; top:0; left:0; right:0; height:2px; z-index:400; pointer-events:none;}
+  #barra-progresso-riempimento{width:100%; height:100%; background:var(--oro); transform:scaleX(0); transform-origin:0 0;}
+
+  /* --------------------------------------------------------- foglio X/Y
+     Etichetta che riflette in quale delle sei aree del documento si trova
+     chi legge (vedi script in fondo). In alto a destra: l'unico angolo che
+     non incontra mai la barra fissa Chiama/WhatsApp, ancorata in basso solo
+     sotto i 760px.
+     --------------------------------------------------------------------- */
+  #foglio{
+    position:fixed; top:14px; right:14px; z-index:400;
+    padding:5px 9px; pointer-events:none;
+    background:rgba(5,20,20,0.55); border:1px solid var(--filo);
+  }
+
   .scena{position:relative; z-index:1;}
 
   .wrap{max-width:var(--max); margin:0 auto; padding:0 22px;}
@@ -384,10 +405,21 @@
   }
   .riquadro-sub{color:var(--muschio); font-size:0.87rem; margin-top:3px;}
   .prezzo{display:flex; align-items:baseline; flex-wrap:wrap; gap:10px; margin:24px 0 6px;}
+  .prezzo-vecchio-wrap{position:relative; display:inline-block;}
   .prezzo-vecchio{
     font-family:var(--mono); font-size:1.1rem; color:var(--muschio);
-    text-decoration:line-through; text-decoration-thickness:1px;
     font-variant-numeric:tabular-nums;
+  }
+  /* Tratto a penna vero, non un text-decoration: si disegna quando il
+     riquadro prezzo entra a schermo, riusando lo stesso trigger (.vista)
+     già gestito altrove per l'effetto tendina — vedi script in fondo per
+     il calcolo di stroke-dasharray/dashoffset via getTotalLength(). Senza
+     JS lo stroke-dasharray non viene mai impostato: il tratto appare già
+     intero, di suo. */
+  .prezzo-taglio{position:absolute; inset:0; width:100%; height:100%; overflow:visible;}
+  .prezzo-taglio path{
+    fill:none; stroke:var(--oro); stroke-width:2; stroke-linecap:round;
+    transition:stroke-dashoffset 0.7s cubic-bezier(.65,.05,.36,1);
   }
   .prezzo-forte{
     font-family:var(--mono); font-size:2.4rem; font-weight:600; color:var(--oro-chiaro);
@@ -486,6 +518,31 @@
     text-transform:uppercase; color:var(--crema); font-size:0.86rem; margin-bottom:13px;
   }
 
+  /* --------------------------------------------------------------- sigillo
+     Controparte del sipario d'apertura: la pagina si apre con un gesto e si
+     chiude con un altro. Riusa il motivo dei segni ad angolo in scala
+     ridotta. Il "colpo" è nei fotogrammi qui sotto, non in una dissolvenza:
+     appare grande e trasparente, si contrae di scatto (l'impatto), poi si
+     assesta. Il trigger è un IntersectionObserver dedicato in fondo.
+     --------------------------------------------------------------------- */
+  @keyframes sigillo-timbro{
+    0%{transform:scale(2.1); opacity:0;}
+    45%{transform:scale(0.85); opacity:1;}
+    70%{transform:scale(1.07); opacity:1;}
+    100%{transform:scale(1); opacity:1;}
+  }
+  .sigillo{
+    width:44px; height:44px; margin:0 auto 16px; opacity:0;
+    display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--oro-fioco);
+  }
+  .sigillo.vista{animation:sigillo-timbro 0.55s cubic-bezier(.22,.8,.32,1) both;}
+  .sigillo .segno{width:8px; height:8px;}
+  .sigillo-testo{
+    font-family:var(--serif); font-weight:500; font-size:0.86rem;
+    letter-spacing:0.05em; color:var(--oro);
+  }
+
   /* ------------------------------------------------- barra fissa mobile */
   .barra-fissa{
     position:fixed; left:0; right:0; bottom:0; z-index:60;
@@ -523,6 +580,7 @@
   .reveal{opacity:1; transform:none;}
   .smaschera{clip-path:none;}
   .apertura-testa > *, .apertura-illo, .illo{animation:none;}
+  .sigillo{opacity:1; animation:none;}
 </style></noscript>
 </head>
 <body>
@@ -579,6 +637,12 @@
 
 <!-- Grana fotografica: canvas nativo, disegnato e ridisegnato via script in fondo alla pagina -->
 <canvas id="grana" aria-hidden="true"></canvas>
+
+<!-- Filo d'oro che riempie in proporzione allo scroll: vedi script in fondo -->
+<div id="barra-progresso" aria-hidden="true"><div id="barra-progresso-riempimento"></div></div>
+
+<!-- "Foglio X di 06": in quale area della pagina si trova chi legge, vedi script in fondo -->
+<div id="foglio" class="cifra" aria-hidden="true">01 / 06</div>
 
 <div class="scena">
 
@@ -757,7 +821,12 @@
         <h3>Il sito</h3>
         <p class="riquadro-sub">Realizzazione completa</p>
         <div class="prezzo">
-          <span class="prezzo-vecchio">490 €</span>
+          <span class="prezzo-vecchio-wrap">
+            <span class="prezzo-vecchio">490 €</span>
+            <svg class="prezzo-taglio" viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M3,17 C28,10 55,22 97,13"/>
+            </svg>
+          </span>
           <span class="prezzo-forte">390 €</span>
           <span class="prezzo-nota">una tantum</span>
         </div>
@@ -915,6 +984,10 @@
 
 <footer>
   <div class="wrap">
+    <div class="sigillo cornice" aria-hidden="true">
+      <span class="segno tl"></span><span class="segno tr"></span><span class="segno bl"></span><span class="segno br"></span>
+      <span class="sigillo-testo">LZ</span>
+    </div>
     <p class="firma">Lorenzo Zenucchi</p>
     <p>Web designer &amp; developer · Val Seriana, Bergamo</p>
     <p>Questa pagina è fatta come i siti che vendo: un solo file, nessun cookie, nessun tracciamento.</p>
@@ -941,6 +1014,58 @@
     }, {threshold: 0}).observe(apertura);
   })();
 
+  // Barra di avanzamento: un filo che riflette 1:1 la posizione di scroll,
+  // non un'animazione ambientale — per questo è l'unico elemento nuovo
+  // escluso da prefers-reduced-motion. Aggiornato con requestAnimationFrame
+  // legato allo scroll, mai con un timer fisso.
+  (function(){
+    var riempimento = document.getElementById('barra-progresso-riempimento');
+    if(!riempimento) return;
+    var pronto = true;
+    function aggiorna(){
+      var doc = document.documentElement;
+      var scorribile = doc.scrollHeight - doc.clientHeight;
+      var rapporto = scorribile > 0 ? (window.scrollY || doc.scrollTop) / scorribile : 0;
+      riempimento.style.transform = 'scaleX(' + Math.min(1, Math.max(0, rapporto)) + ')';
+      pronto = true;
+    }
+    function richiedi(){
+      if(!pronto) return;
+      pronto = false;
+      requestAnimationFrame(aggiorna);
+    }
+    aggiorna();
+    window.addEventListener('scroll', richiedi, {passive: true});
+    window.addEventListener('resize', richiedi);
+  })();
+
+  // Foglio X/06: in quale delle sei aree del documento si trova chi legge,
+  // nello stesso ordine in cui compaiono nella pagina. Una fascia stretta
+  // al centro del viewport (rootMargin -45%/-45%) fa da "linea di lettura":
+  // quando un'area la attraversa, aggiorna l'etichetta.
+  (function(){
+    var etichetta = document.getElementById('foglio');
+    if(!etichetta || !('IntersectionObserver' in window)) return;
+    var aree = [
+      document.querySelector('.apertura'),
+      document.getElementById('esempi'),
+      document.getElementById('prezzi'),
+      document.getElementById('come-funziona'),
+      document.getElementById('chi-sono'),
+      document.getElementById('contatti')
+    ].filter(Boolean);
+    if(aree.length !== 6) return;
+    function due(n){ return n < 10 ? '0' + n : '' + n; }
+    var osservatore = new IntersectionObserver(function(voci){
+      voci.forEach(function(voce){
+        if(!voce.isIntersecting) return;
+        var indice = aree.indexOf(voce.target);
+        if(indice > -1) etichetta.textContent = due(indice + 1) + ' / 06';
+      });
+    }, {threshold: 0, rootMargin: '-45% 0px -45% 0px'});
+    aree.forEach(function(el){ osservatore.observe(el); });
+  })();
+
   // Ogni pannello marcato .reveal o .smaschera entra una volta sola quando
   // arriva a schermo. Un solo osservatore per tutta la pagina, non uno per
   // elemento: cambia solo la transizione CSS che ciascuna classe usa.
@@ -964,6 +1089,20 @@
     elementi.forEach(function(el){ osservatore.observe(el); });
   })();
 
+  // Il 490 € si disegna con un vero tratto SVG, non un text-decoration
+  // statico. getTotalLength() dipende solo dalla geometria del path, non
+  // dalla sua visibilità: funziona anche da subito, mentre il riquadro è
+  // ancora tagliato dal clip-path di .smaschera. Lo si nasconde impostando
+  // dash e offset alla stessa lunghezza; il disegno vero scatta più sotto,
+  // nello stesso momento in cui il riquadro riceve .vista.
+  (function(){
+    var taglio = document.querySelector('.prezzo-taglio path');
+    if(!taglio || typeof taglio.getTotalLength !== 'function') return;
+    var lunghezza = taglio.getTotalLength();
+    taglio.style.strokeDasharray = lunghezza;
+    taglio.style.strokeDashoffset = lunghezza;
+  })();
+
   // I due riquadri prezzo e le tre card esempio (tutti .smaschera) hanno
   // clip-path per l'effetto tendina. Osservarli direttamente con
   // IntersectionObserver non funziona: finché sono nascosti il loro
@@ -973,10 +1112,13 @@
   // scatta mai (verificato: rimuovendo il clip-path prima dello scroll
   // l'observer li vede regolarmente). Si osserva quindi il loro
   // contenitore (che non ha clip-path) e si passa la classe ai figli
-  // .smaschera quando quello entra in schermo.
+  // .smaschera quando quello entra in schermo — lo stesso momento in cui,
+  // se il figlio è il riquadro prezzo con il tratto sul 490 €, il tratto
+  // riceve anche lui il suo dashoffset a zero per disegnarsi.
   (function(){
     if(!('IntersectionObserver' in window)){
       document.querySelectorAll('.prezzi .smaschera, .griglia-esempi .smaschera').forEach(function(el){ el.classList.add('vista'); });
+      document.querySelectorAll('.prezzo-taglio path').forEach(function(el){ el.style.strokeDashoffset = '0'; });
       return;
     }
     ['.prezzi', '.griglia-esempi'].forEach(function(selettoreContenitore){
@@ -985,12 +1127,37 @@
       if(!contenitore || !figli.length) return;
       var osservatore = new IntersectionObserver(function(voci){
         if(voci[0].isIntersecting){
-          figli.forEach(function(el){ el.classList.add('vista'); });
+          figli.forEach(function(el){
+            el.classList.add('vista');
+            var taglio = el.querySelector('.prezzo-taglio path');
+            if(taglio) taglio.style.strokeDashoffset = '0';
+          });
           osservatore.unobserve(contenitore);
         }
       }, {threshold: 0.15, rootMargin: '0px 0px -8% 0px'});
       osservatore.observe(contenitore);
     });
+  })();
+
+  // Sigillo nel footer: controparte del sipario d'apertura. Un solo
+  // IntersectionObserver dedicato perché il footer non è un .reveal/
+  // .smaschera come le altre sezioni — qui il gesto è un timbro (vedi
+  // @keyframes sigillo-timbro), non una semplice dissolvenza.
+  (function(){
+    var sigillo = document.querySelector('.sigillo');
+    var piePagina = document.querySelector('footer');
+    if(!sigillo || !piePagina) return;
+    if(!('IntersectionObserver' in window)){
+      sigillo.classList.add('vista');
+      return;
+    }
+    var osservatore = new IntersectionObserver(function(voci){
+      if(voci[0].isIntersecting){
+        sigillo.classList.add('vista');
+        osservatore.unobserve(piePagina);
+      }
+    }, {threshold: 0.3});
+    osservatore.observe(piePagina);
   })();
 
   // Grana fotografica: rumore casuale disegnato su un canvas a risoluzione

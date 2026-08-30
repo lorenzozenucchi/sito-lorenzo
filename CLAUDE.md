@@ -87,6 +87,12 @@ non negoziabili: tutto rispetta `prefers-reduced-motion`, e il `<noscript>` in
 testa rende visibili i pannelli `.reveal` — senza JavaScript la pagina resta
 leggibile, perché il contenuto viene prima dell'animazione.
 
+Quattro dettagli minori riusano lo stesso linguaggio, senza introdurne uno nuovo:
+- un filo d'oro fisso in cima al viewport segue lo scroll 1:1 (`#barra-progresso`) — l'unico elemento escluso da `prefers-reduced-motion`, perché è un indicatore funzionale, non un'animazione ambientale;
+- un'etichetta mono "X / 06" in alto a destra (`#foglio`) segnala in quale delle sei aree della pagina si trova chi legge;
+- il "490 €" barrato è un vero tratto SVG con una leggera imperfezione organica, che si disegna quando il riquadro prezzo entra a schermo, non più un `text-decoration` statico;
+- il footer chiude con un piccolo sigillo "LZ" (`.sigillo`, segni d'angolo in scala ridotta) che scatta con un gesto a timbro — la controparte del sipario d'apertura.
+
 Esiste anche un foglio-offerta cartaceo con una palette diversa (crema e
 bordeaux): **non è il riferimento**. Il riferimento è il biglietto. Del
 foglio-offerta si riusa l'impianto della sezione prezzi, non i colori.
