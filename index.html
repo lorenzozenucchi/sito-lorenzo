@@ -433,38 +433,18 @@
   }
   @media(min-width:480px){ .mock{height:280px;} }
   .mock img{
-    --pan:-14%;
     width:100%; height:auto; display:block;
     position:absolute; top:0; left:0;
     animation:mock-pan 16s ease-in-out infinite;
   }
-  /* Le tre card condividono un'unica animation-duration (16s, ereditata da
-     qui: nessuna delle tre la sovrascrive più). Con durate diverse (18s/13s/
-     20s) le card andavano fuori fase l'una dall'altra: in un dato istante
-     una poteva trovarsi a metà pan mentre le altre erano ferme sul
-     fotogramma pulito. Sincronizzate, sono sempre nello stesso punto del
-     ciclo — non serve più chiedersi "quale card, in quel momento".
-     L'ampiezza del pan (--pan) è invece diversa per la card ristorante: il
-     suo screenshot sorgente (390×910) è molto più corto di quello delle
-     altre due (390×1500 entrambi), quindi lo stesso -14% usato per tutte
-     cadeva a metà del titolo "Il sapore vero della valle." invece di
-     superarlo — non un problema di fase ma di proporzioni fra immagini di
-     altezza diversa. */
+  .mock-ristorante img{animation-duration:18s;}
+  .mock-parrucchiere img{animation-duration:13s;}
+  .mock-estetico img{animation-duration:20s;}
   @keyframes mock-pan{
-    /* Il pan resta lento quanto prima (commit c24f423): a cambiare è solo
-       come si distribuisce nel ciclo. Il fotogramma pulito dall'alto
-       (translateY(0)) e quello pulito in basso (translateY(var(--pan)))
-       occupano insieme l'88% del ciclo; la discesa e la risalita — l'unico
-       tratto in cui un titolo vicino al bordo superiore dello screenshot
-       potrebbe apparire a metà — durano il 6% ciascuna, circa un secondo su
-       16: un passaggio, non una sosta. */
-    0%, 44%{transform:translateY(0);}
-    50%{transform:translateY(var(--pan));}
-    88%{transform:translateY(var(--pan));}
-    94%, 100%{transform:translateY(0);}
+    0%, 100%{transform:translateY(0);}
+    50%{transform:translateY(-14%);}
   }
   .mock-ristorante{--m-bg:#18130f;}
-  .mock-ristorante img{--pan:-36%;}
   .mock-parrucchiere{--m-bg:#f4efe7;}
   .mock-estetico{--m-bg:#faf6f0;}
 
