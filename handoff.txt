@@ -1,54 +1,44 @@
 ================================================================================
-Annulla SOLO il punto 4 del task precedente: animazioni pan delle anteprime
+Rimuovere la barra di avanzamento in cima allo schermo (resta il percorso)
 ================================================================================
+
+CONTESTO (nuovo)
+----------------
+In index.html ci sono due indicatori di scroll indipendenti: la barra fissa
+in cima al viewport (`#barra-progresso` / `#barra-progresso-riempimento`,
+filo d'oro 2px che si riempie con lo scroll) e il "percorso nella valle"
+(`.percorso` / `#percorso-svg` / `#percorso-punto`, il filo che scende nel
+flusso della pagina dall'apertura ai contatti). Sono ridondanti: due
+indicatori della stessa percentuale di scroll. Lorenzo vuole tenere solo il
+percorso e togliere la barra in cima.
+Non è la stessa cosa di `#barra-fissa` (la barra di navigazione che appare
+quando si scorre oltre l'apertura, gestita alle righe 1095-1103): quella non
+c'entra, non toccarla.
 
 OBIETTIVO
 ---------
-Lorenzo ha rivisto la scelta sul punto 4 dell'handoff precedente ("Pan delle
-card esempio"): non vuole che le animazioni di pan siano state toccate,
-comprese le durate sincronizzate a 16s, i keyframe con soste lunghe e la
-variabile CSS --pan introdotta per la card ristorante. Le vuole esattamente
-come prima di quel task.
+Rimuovi completamente `#barra-progresso` da index.html, nei tre punti in cui
+compare:
+1. Il markup HTML: `<div id="barra-progresso" aria-hidden="true">...</div>`
+   (riga 719).
+2. Le regole CSS `#barra-progresso` e `#barra-progresso-riempimento`, con il
+   commento che le introduce (blocco "barra di avanzamento", righe 148-155).
+3. La IIFE JavaScript che la aggiorna allo scroll (righe 1105-1128, il blocco
+   commentato "Barra di avanzamento: un filo che riflette 1:1..." fino alla
+   chiusura `})();` prima del blocco "Percorso nella valle").
 
-Ripristina in index.html, testuale, questo blocco (era così prima della tua
-modifica al punto 4, verificato leggendo il file prima di assegnare il task
-precedente):
+Il "percorso nella valle" (.percorso e tutto il suo script, che segue subito
+dopo nel file) resta invariato: è un blocco JS indipendente, non condivide
+variabili con quello della barra.
 
-  .mock img{
-    width:100%; height:auto; display:block;
-    position:absolute; top:0; left:0;
-    animation:mock-pan 16s ease-in-out infinite;
-  }
-  .mock-ristorante img{animation-duration:18s;}
-  .mock-parrucchiere img{animation-duration:13s;}
-  .mock-estetico img{animation-duration:20s;}
-  @keyframes mock-pan{
-    0%, 100%{transform:translateY(0);}
-    50%{transform:translateY(-14%);}
-  }
-
-Concretamente:
-- Rimuovi ogni riferimento alla variabile CSS --pan (dichiarazione e uso),
-  sia in CSS che negli attributi style eventualmente aggiunti nell'HTML.
-- Riporta i keyframe di `mock-pan` alla forma sopra (via unica, niente soste
-  intermedie aggiuntive).
-- Riporta `animation-duration` a 18s / 13s / 20s per ristorante / parrucchiere
-  / estetico rispettivamente (non più 16s uniforme).
-- Non toccare nient'altro: gli altri quattro punti del task precedente
-  (illustrazione nascosta sotto i 900px, testo intro "scheda Google",
-  occhiello "Esempi", nota B&B senza tono scusante) restano come sono, non
-  rimetterli in discussione.
-
-Fatto quando: il blocco CSS di `.mock img`, delle tre `animation-duration` e
-di `@keyframes mock-pan` corrisponde esattamente a quello sopra, e non
-compare più nessuna variabile --pan nel file.
+Fatto quando: nel file non compare più nessun riferimento a
+"barra-progresso" (né in HTML, né in CSS, né in JS), il percorso nella
+valle funziona come prima, e non resta alcun riferimento spezzato (es.
+variabili non dichiarate) nello script rimasto.
 
 VINCOLI
 -------
-- Non toccare esempi/ristorante.html, esempi/parrucchiere.html,
-  esempi/centro-estetico.html.
-- Non toccare i file PNG in immagini/.
-- Non toccare nessun'altra sezione o regola CSS oltre a quella indicata sopra.
-- Se durante il ripristino trovi che il codice attuale non corrisponde a
-  quanto ti aspetti da questa descrizione (es. struttura diversa da quella
-  presunta), fermati e segnala la discrepanza invece di improvvisare.
+- Non toccare `#barra-fissa` (barra di navigazione sticky) né il suo script.
+- Non toccare `.percorso` e il suo script.
+- Non toccare esempi/*.html né i PNG in immagini/.
+- Se emerge un dubbio bloccante, fermati e chiedi invece di improvvisare.
