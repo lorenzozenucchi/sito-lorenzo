@@ -260,6 +260,7 @@
   .apertura-testa > *:nth-child(5){animation-delay:.45s;}
   .apertura-testa > *:nth-child(6){animation-delay:.55s;}
   .apertura-testa > *:nth-child(7){animation-delay:.65s;}
+  .apertura-testa > *:nth-child(8){animation-delay:.75s;}
 
   /* Scala drammatica: il payoff pesa come farebbe un titolo di copertina,
      il resto della gerarchia si ridimensiona apposta per non competergli. */
@@ -275,6 +276,22 @@
     font-family:var(--mono);
     font-size:0.6rem; letter-spacing:0.2em; text-indent:0.2em;
     text-transform:uppercase; color:var(--oro); font-weight:500;
+  }
+  /* elenco di link alle sezioni, stesso registro tipografico delle etichette
+     piccole della pagina (.occhiello/.cifra: mono, maiuscolo, lettere
+     piccole) — non un menu vistoso, solo un rimando discreto. Statico,
+     dentro l'header stesso: nessun elemento fisso, nessuna tendina. */
+  .nav-apertura{
+    display:flex; flex-wrap:wrap; justify-content:center; align-items:baseline;
+    column-gap:10px; row-gap:6px; margin-top:16px;
+    font-family:var(--mono); font-size:0.64rem; font-weight:500;
+    letter-spacing:0.08em; text-transform:uppercase;
+  }
+  @media(min-width:900px){ .nav-apertura{justify-content:flex-start;} }
+  .nav-apertura a{color:var(--muschio); transition:color 0.2s;}
+  .nav-apertura a:hover, .nav-apertura a:focus-visible{color:var(--oro);}
+  .nav-apertura a:not(:first-child)::before{
+    content:"·"; display:inline-block; margin-right:10px; color:var(--oro-fioco);
   }
   .filo-oro{
     width:44px; height:1px; background:var(--oro);
@@ -724,6 +741,14 @@
     <div class="apertura-testa">
       <h1 class="nome">Lorenzo Zenucchi</h1>
       <p class="ruolo">Web designer · Val Seriana</p>
+
+      <nav class="nav-apertura" aria-label="Sezioni della pagina">
+        <a href="#esempi">Esempi</a>
+        <a href="#prezzi">Quanto costa</a>
+        <a href="#come-funziona">Come funziona</a>
+        <a href="#chi-sono">Chi sono</a>
+        <a href="#contatti">Contatti</a>
+      </nav>
 
       <div class="filo-oro"></div>
 

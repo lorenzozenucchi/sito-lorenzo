@@ -1,44 +1,82 @@
 ================================================================================
-Rimuovere la barra di avanzamento in cima allo schermo (resta il percorso)
+Elenco di sezioni in apertura, tra ruolo e payoff
 ================================================================================
 
 CONTESTO (nuovo)
 ----------------
-In index.html ci sono due indicatori di scroll indipendenti: la barra fissa
-in cima al viewport (`#barra-progresso` / `#barra-progresso-riempimento`,
-filo d'oro 2px che si riempie con lo scroll) e il "percorso nella valle"
-(`.percorso` / `#percorso-svg` / `#percorso-punto`, il filo che scende nel
-flusso della pagina dall'apertura ai contatti). Sono ridondanti: due
-indicatori della stessa percentuale di scroll. Lorenzo vuole tenere solo il
-percorso e togliere la barra in cima.
-Non è la stessa cosa di `#barra-fissa` (la barra di navigazione che appare
-quando si scorre oltre l'apertura, gestita alle righe 1095-1103): quella non
-c'entra, non toccarla.
+Decisione presa con Lorenzo dopo un confronto su due alternative (tendina
+apribile vs elenco statico in testa): niente tendina, niente elemento fisso
+o a comparsa allo scroll — un piccolo elenco di link alle sezioni, statico,
+dentro l'header stesso. Motivo: non essendo legato a nessun trigger di
+scroll, entra con la stessa animazione d'apertura del resto dell'header,
+senza accavallarsi con la comparsa della barra CTA in basso (`#barra-fissa`)
+o dei contenuti di #esempi quando si esce dall'apertura.
+
+Struttura attuale di `.apertura-testa` (i figli diretti, in ordine):
+  1. h1.nome
+  2. p.ruolo ("Web designer · Val Seriana")
+  3. div.filo-oro (divisorio dorato)
+  4. p.payoff ("La tua attività. Online come merita.")
+  5. p.intro
+  6. div.azioni
+  7. div.categorie (le sei icone Ristoranti/Parrucchieri/ecc.)
+
+Questi sette figli hanno un'animazione d'ingresso scalettata via CSS:
+`.apertura-testa > *{animation:salgo ...}` più una regola
+`:nth-child(1)` .. `:nth-child(7)` con ritardo via via maggiore (+0.10s a
+ogni figlio, da .05s a .65s) — righe 255-262 circa.
 
 OBIETTIVO
 ---------
-Rimuovi completamente `#barra-progresso` da index.html, nei tre punti in cui
-compare:
-1. Il markup HTML: `<div id="barra-progresso" aria-hidden="true">...</div>`
-   (riga 719).
-2. Le regole CSS `#barra-progresso` e `#barra-progresso-riempimento`, con il
-   commento che le introduce (blocco "barra di avanzamento", righe 148-155).
-3. La IIFE JavaScript che la aggiorna allo scroll (righe 1105-1128, il blocco
-   commentato "Barra di avanzamento: un filo che riflette 1:1..." fino alla
-   chiusura `})();` prima del blocco "Percorso nella valle").
+Inserisci un nuovo elemento — un `<nav>` con cinque link — come figlio
+diretto di `.apertura-testa`, subito dopo `p.ruolo` e prima di
+`div.filo-oro` (diventa quindi il terzo figlio, spostando gli attuali
+3-7 di una posizione: 3→4, 4→5, 5→6, 6→7, 7→8).
 
-Il "percorso nella valle" (.percorso e tutto il suo script, che segue subito
-dopo nel file) resta invariato: è un blocco JS indipendente, non condivide
-variabili con quello della barra.
+I cinque link, in questo ordine, con l'href verso l'id di sezione esistente
+e il testo IDENTICO all'occhiello già usato in quella sezione (non
+inventare etichette nuove):
+  - Esempi        → #esempi
+  - Quanto costa  → #prezzi
+  - Come funziona → #come-funziona
+  - Chi sono      → #chi-sono
+  - Contatti      → #contatti
 
-Fatto quando: nel file non compare più nessun riferimento a
-"barra-progresso" (né in HTML, né in CSS, né in JS), il percorso nella
-valle funziona come prima, e non resta alcun riferimento spezzato (es.
-variabili non dichiarate) nello script rimasto.
+Stile: discreto, non un menu vistoso — usa lo stesso registro tipografico
+già impiegato per le etichette piccole della pagina (`.occhiello`, `.cifra`:
+mono, lettere piccole), non un nuovo linguaggio visivo. Separatore leggero
+tra i link (es. un punto), a tua scelta nei dettagli. Su mobile resta
+centrato come il resto di `.apertura-testa`; oltre i 900px segue lo stesso
+allineamento a sinistra della colonna (vedi riga 259-260).
+
+Effetto collaterale da NON dimenticare: poiché il nuovo elemento diventa
+l'ottavo figlio di `.apertura-testa` a valle dell'inserimento (il vecchio
+settimo, `.categorie`, ora è l'ottavo), serve aggiungere anche una regola
+`.apertura-testa > *:nth-child(8){animation-delay:.75s;}` (stesso incremento
+di 0.10s delle altre). Senza, `.categorie` perderebbe il ritardo e
+apparirebbe insieme al titolo invece che per ultima, rompendo la
+scalettatura. Le regole nth-child(1)-(7) esistenti non vanno toccate:
+puntando per posizione, si riallineano da sole ai figli spostati.
+
+Fatto quando:
+- I cinque link sono presenti, nell'ordine sopra, con testo ed href
+  corretti, e portano davvero alla sezione giusta.
+- L'elemento è figlio diretto di `.apertura-testa`, tra `.ruolo` e
+  `.filo-oro`.
+- È stata aggiunta la regola nth-child(8); verificato che `.categorie` anima
+  ancora per ultima, non insieme al titolo (controllo visivo o lettura del
+  CSS finale).
+- Screenshot Playwright a 360px di larghezza (il più stretto realistico) e a
+  ≥900px: l'elenco non trabocca orizzontalmente, non si sovrappone ad altri
+  elementi, resta leggibile su entrambe.
 
 VINCOLI
 -------
-- Non toccare `#barra-fissa` (barra di navigazione sticky) né il suo script.
-- Non toccare `.percorso` e il suo script.
+- Nessun elemento fisso/sticky, nessuna tendina o toggle apri/chiudi: è
+  stato scartato, resta solo l'elenco statico nell'header.
+- Non toccare altre sezioni, non riscrivere il testo esistente di
+  `.ruolo`/`.payoff`/`.intro`, non toccare `#barra-fissa`.
 - Non toccare esempi/*.html né i PNG in immagini/.
-- Se emerge un dubbio bloccante, fermati e chiedi invece di improvvisare.
+- Se il posizionamento tra ruolo e filo-oro, una volta reso, sembra
+  visivamente sbagliato rispetto al divisorio dorato, segnalalo invece di
+  spostarlo di tua iniziativa senza dirlo.
