@@ -1,82 +1,31 @@
 ================================================================================
-Elenco di sezioni in apertura, tra ruolo e payoff
+Togliere la riga "Questa pagina è fatta come i siti che vendo..." dal footer
 ================================================================================
-
-CONTESTO (nuovo)
-----------------
-Decisione presa con Lorenzo dopo un confronto su due alternative (tendina
-apribile vs elenco statico in testa): niente tendina, niente elemento fisso
-o a comparsa allo scroll — un piccolo elenco di link alle sezioni, statico,
-dentro l'header stesso. Motivo: non essendo legato a nessun trigger di
-scroll, entra con la stessa animazione d'apertura del resto dell'header,
-senza accavallarsi con la comparsa della barra CTA in basso (`#barra-fissa`)
-o dei contenuti di #esempi quando si esce dall'apertura.
-
-Struttura attuale di `.apertura-testa` (i figli diretti, in ordine):
-  1. h1.nome
-  2. p.ruolo ("Web designer · Val Seriana")
-  3. div.filo-oro (divisorio dorato)
-  4. p.payoff ("La tua attività. Online come merita.")
-  5. p.intro
-  6. div.azioni
-  7. div.categorie (le sei icone Ristoranti/Parrucchieri/ecc.)
-
-Questi sette figli hanno un'animazione d'ingresso scalettata via CSS:
-`.apertura-testa > *{animation:salgo ...}` più una regola
-`:nth-child(1)` .. `:nth-child(7)` con ritardo via via maggiore (+0.10s a
-ogni figlio, da .05s a .65s) — righe 255-262 circa.
 
 OBIETTIVO
 ---------
-Inserisci un nuovo elemento — un `<nav>` con cinque link — come figlio
-diretto di `.apertura-testa`, subito dopo `p.ruolo` e prima di
-`div.filo-oro` (diventa quindi il terzo figlio, spostando gli attuali
-3-7 di una posizione: 3→4, 4→5, 5→6, 6→7, 7→8).
+In index.html, dentro `<footer>`, rimuovi questa riga per intero (circa riga
+1094):
 
-I cinque link, in questo ordine, con l'href verso l'id di sezione esistente
-e il testo IDENTICO all'occhiello già usato in quella sezione (non
-inventare etichette nuove):
-  - Esempi        → #esempi
-  - Quanto costa  → #prezzi
-  - Come funziona → #come-funziona
-  - Chi sono      → #chi-sono
-  - Contatti      → #contatti
+  <p>Questa pagina è fatta come i siti che vendo: un solo file, nessun cookie, nessun tracciamento.</p>
 
-Stile: discreto, non un menu vistoso — usa lo stesso registro tipografico
-già impiegato per le etichette piccole della pagina (`.occhiello`, `.cifra`:
-mono, lettere piccole), non un nuovo linguaggio visivo. Separatore leggero
-tra i link (es. un punto), a tua scelta nei dettagli. Su mobile resta
-centrato come il resto di `.apertura-testa`; oltre i 900px segue lo stesso
-allineamento a sinistra della colonna (vedi riga 259-260).
+Motivo (non serve altro contesto per farlo, ma per chiarezza): la frase
+metteva in equivalenza questa pagina personale con i siti che si consegnano
+ai clienti, cosa non vera (i siti clienti hanno menu, prenotazioni, gallery
+— diversi da questa pagina) e comunque promette "nessun cookie" in modo che
+potrebbe diventare falso in futuro. Si toglie e basta, nessuna riga
+sostitutiva.
 
-Effetto collaterale da NON dimenticare: poiché il nuovo elemento diventa
-l'ottavo figlio di `.apertura-testa` a valle dell'inserimento (il vecchio
-settimo, `.categorie`, ora è l'ottavo), serve aggiungere anche una regola
-`.apertura-testa > *:nth-child(8){animation-delay:.75s;}` (stesso incremento
-di 0.10s delle altre). Senza, `.categorie` perderebbe il ritardo e
-apparirebbe insieme al titolo invece che per ultima, rompendo la
-scalettatura. Le regole nth-child(1)-(7) esistenti non vanno toccate:
-puntando per posizione, si riallineano da sole ai figli spostati.
+Il footer dopo la rimozione deve contenere solo: il sigillo "LZ", "Lorenzo
+Zenucchi" e "Web designer · Val Seriana, Bergamo".
 
-Fatto quando:
-- I cinque link sono presenti, nell'ordine sopra, con testo ed href
-  corretti, e portano davvero alla sezione giusta.
-- L'elemento è figlio diretto di `.apertura-testa`, tra `.ruolo` e
-  `.filo-oro`.
-- È stata aggiunta la regola nth-child(8); verificato che `.categorie` anima
-  ancora per ultima, non insieme al titolo (controllo visivo o lettura del
-  CSS finale).
-- Screenshot Playwright a 360px di larghezza (il più stretto realistico) e a
-  ≥900px: l'elenco non trabocca orizzontalmente, non si sovrappone ad altri
-  elementi, resta leggibile su entrambe.
+Fatto quando: quella riga non compare più nel file, il resto del footer
+(sigillo, firma, ruolo/luogo) è invariato, e non resta alcun riferimento a
+quella frase altrove nel file (controlla con una ricerca testuale prima di
+chiudere, non fidarti a occhio).
 
 VINCOLI
 -------
-- Nessun elemento fisso/sticky, nessuna tendina o toggle apri/chiudi: è
-  stato scartato, resta solo l'elenco statico nell'header.
-- Non toccare altre sezioni, non riscrivere il testo esistente di
-  `.ruolo`/`.payoff`/`.intro`, non toccare `#barra-fissa`.
-- Non toccare esempi/*.html né i PNG in immagini/.
-- Se il posizionamento tra ruolo e filo-oro, una volta reso, sembra
-  visivamente sbagliato rispetto al divisorio dorato, segnalalo invece di
-  spostarlo di tua iniziativa senza dirlo.
+- Non toccare `footer p{margin-bottom:6px;}` né `.firma`: si applicano bene
+  anche con un paragrafo in meno, non serve modificarli.
+- Non toccare altro nel footer o nel resto della pagina.
