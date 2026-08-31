@@ -1,31 +1,70 @@
 ================================================================================
-Togliere la riga "Questa pagina è fatta come i siti che vendo..." dal footer
+Collegare sito-lorenzo a Vercel e preparare il dominio lorenzoweb.it
 ================================================================================
+
+CONTESTO
+--------
+Progetto: sito-lorenzo, ~/locali/sito-lorenzo. Sito personale a pagina
+singola, HTML statico puro: index.html in root, nessun package.json, nessun
+build step. Repo GitHub: lorenzozenucchi/sito-lorenzo, branch master, pulito
+e allineato a origin (nessuna modifica in sospeso).
+
+Decisione presa oggi (31/08/2026) da Lorenzo: cambio del canale di
+pubblicazione. Il piano precedente (28/08/2026) era GitHub Pages +
+Cloudflare; ora si pubblica su Vercel. Il dominio lorenzoweb.it verrà
+acquistato da Lorenzo direttamente su Aruba — è un'azione sua, fuori da
+questo task, nessun tool può farla al posto suo.
+
+Stato attuale su Vercel: nel team "Lollo" (slug lollo5) esiste un solo
+progetto, "console-operativa" — sito-lorenzo NON è ancora collegato. C'è un
+file locale `.vercel/repo.json` che referenzia un projectId
+(prj_kTg3DWdRg9EAV5O7bCY2TwGnOZF8) verificato oggi come inesistente su
+Vercel (risposta 404): è il residuo di un collegamento mai completato, va
+ignorato e ricreato da zero (non riusarlo).
+
+RUOLO
+-----
+Sei l'esecutore del progetto, il task è già deciso, non rimetterlo in
+discussione.
 
 OBIETTIVO
 ---------
-In index.html, dentro `<footer>`, rimuovi questa riga per intero (circa riga
-1094):
+1. Creare/collegare su Vercel (team lollo5) un progetto chiamato
+   sito-lorenzo a partire dal repo GitHub lorenzozenucchi/sito-lorenzo
+   (branch master). Usa i tool Vercel disponibili in questa sessione se
+   presenti; altrimenti la CLI `vercel` (già usata in precedenza in questa
+   cartella — va ricollegata da capo, il projectId vecchio non è valido).
+2. Fare un deploy e verificare che il sito sia raggiungibile e mostri il
+   contenuto reale di index.html sull'URL *.vercel.app assegnato (nessun
+   build richiesto, è un sito statico).
+3. Aggiungere lorenzoweb.it come dominio custom del progetto Vercel (si può
+   aggiungere anche prima che il dominio sia registrato/puntato: Vercel lo
+   accetta e lo segna "non verificato" finché il DNS non punta a lui).
+4. Riportare a Lorenzo, testuali, i valori DNS che Vercel richiede per
+   quel dominio (record A / CNAME per l'apex, o i nameserver — quello che
+   propone Vercel per un dominio .it di primo livello): servono a lui per
+   configurarli sul pannello di Aruba dopo l'acquisto. Non è compito
+   dell'esecutore toccare Aruba: solo restituire questi valori.
 
-  <p>Questa pagina è fatta come i siti che vendo: un solo file, nessun cookie, nessun tracciamento.</p>
-
-Motivo (non serve altro contesto per farlo, ma per chiarezza): la frase
-metteva in equivalenza questa pagina personale con i siti che si consegnano
-ai clienti, cosa non vera (i siti clienti hanno menu, prenotazioni, gallery
-— diversi da questa pagina) e comunque promette "nessun cookie" in modo che
-potrebbe diventare falso in futuro. Si toglie e basta, nessuna riga
-sostitutiva.
-
-Il footer dopo la rimozione deve contenere solo: il sigillo "LZ", "Lorenzo
-Zenucchi" e "Web designer · Val Seriana, Bergamo".
-
-Fatto quando: quella riga non compare più nel file, il resto del footer
-(sigillo, firma, ruolo/luogo) è invariato, e non resta alcun riferimento a
-quella frase altrove nel file (controlla con una ricerca testuale prima di
-chiudere, non fidarti a occhio).
+Fatto quando: il progetto Vercel esiste ed è collegato al repo giusto, un
+deploy è andato a buon fine con l'URL *.vercel.app che mostra il contenuto
+reale della pagina, lorenzoweb.it risulta aggiunto tra i domini del
+progetto, e i valori DNS da impostare su Aruba sono stati riportati a
+Lorenzo in chiaro (non solo "vedi dashboard Vercel").
 
 VINCOLI
 -------
-- Non toccare `footer p{margin-bottom:6px;}` né `.firma`: si applicano bene
-  anche con un paragrafo in meno, non serve modificarli.
-- Non toccare altro nel footer o nel resto della pagina.
+- Non toccare index.html, CLAUDE.md né altri file di contenuto: è solo un
+  collegamento infrastrutturale, zero modifiche al sito.
+- Non acquistare alcun dominio, né tramite Vercel né altrove: l'acquisto su
+  Aruba lo fa Lorenzo di persona, fuori da questo task.
+- Non attivare Vercel Authentication, password protection o Trusted IPs sul
+  progetto: deve restare pubblico e raggiungibile senza login, come i siti
+  destinati ai clienti.
+- Se il repo GitHub risultasse privato (da verificare, non darlo per
+  scontato), segnalalo a Lorenzo invece di renderlo pubblico di tua
+  iniziativa: è una sua scelta editoriale, non una questione tecnica.
+- In caso di dubbio bloccante — nessun accesso ai tool Vercel né alla CLI,
+  il team Vercel chiede conferme che non puoi dare, o altro imprevisto che
+  impedisce di completare uno dei 4 punti sopra — fermati e riporta a
+  Lorenzo lo stato esatto invece di improvvisare un workaround.

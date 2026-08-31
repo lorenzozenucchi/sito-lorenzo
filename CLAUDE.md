@@ -133,10 +133,15 @@ foglio-offerta si riusa l'impianto della sezione prezzi, non i colori.
 
 ## In sospeso
 
-- **Dominio ed email.** Candidato `lorenzoweb.it`, da verificare su Cloudflare.
-  Finché non c'è, la pagina usa `lorenzozenucchi00@gmail.com` e i tag
-  `canonical` e `og:url` restano commentati nel `<head>`. Le istruzioni per
-  aggiornarli sono nel secondo commento in cima a `index.html`.
+- **Dominio.** `lorenzoweb.it` e `www.lorenzoweb.it` attivi, HTTPS incluso,
+  pubblicati su Vercel (progetto `sito-lorenzo`, collegato al repo GitHub:
+  deploy automatico a ogni push su master). Il canale è cambiato il
+  31/08/2026: non più GitHub Pages + Cloudflare, ora Vercel + dominio
+  registrato su Aruba. I tag `canonical` e `og:url` nel `<head>` di
+  `index.html` puntano già a `https://www.lorenzoweb.it/`. L'email resta
+  `lorenzozenucchi00@gmail.com` per scelta di Lorenzo, non per mancanza del
+  dominio: le istruzioni per passare a un'email sul dominio, se un giorno
+  serve, sono nel commento in cima a `index.html`.
 - **Foto di Lorenzo.** Manca. In "Chi sono" c'è un segnaposto neutro con le
   istruzioni per sostituirlo (`foto/lorenzo.jpg`). Serve una foto vera: chi lo
   ha appena incontrato in negozio deve riconoscere la faccia. Niente foto di
@@ -148,7 +153,6 @@ foglio-offerta si riusa l'impianto della sezione prezzi, non i colori.
   template. Nel file c'è un blocco unico marcato `ALTRE CATEGORIE` che trasforma
   il buco in un motivo per scrivere; quando i template esisteranno, si sostituisce
   con altre tre schede.
-- Pubblicazione (dominio, repository, hosting) è di Lorenzo e viene dopo.
 
 ## Regole di aggiornamento
 
